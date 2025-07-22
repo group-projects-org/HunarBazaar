@@ -98,7 +98,7 @@ const ProductsListed = () => {
         />
       )}
      </div> <div id="products" className="section">
-        <h1>Your Products</h1>
+        <h1>Your Saleable Products</h1>
         <div className="product-container">
           {paginatedProducts.map(product => {
             return (

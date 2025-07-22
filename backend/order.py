@@ -127,6 +127,7 @@ def getOrder():
         if userType == "users": userDetails = collection.find({"user_id": user_id}, {"_id": 0, "payment_status": 0, "qr-sensitive-data": 0, "agent_id": 0, "user_id": 0})
         else: userDetails = collection.find({"agent_id": user_id},{"_id": 0, "payment_status": 0, "qr-sensitive-data": 0, "agent_id": 0, "user_id": 0})
         userDetails = list(userDetails)
+        userDetails = list(reversed(userDetails))
         return jsonify({"orderDetails": userDetails}), 200
     except Exception as e:
         print("❌ Error while processing order:", str(e))

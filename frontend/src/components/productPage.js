@@ -53,11 +53,12 @@ const ProductsPage = () => {
   const handleAddToCart = (productId) => {
     const product = products.find(p => p.id === Number(productId));
     if (!product) return;
+    const { _id, description, variants, tags, ...cleanProduct } = product;
     const existing = cart.find(item => item.product.id === productId);
     let updatedCart;
     if (existing) {
       updatedCart = cart.map(item => item.product.id === productId ? { ...item, quantity: item.quantity + 1 } : item);
-    } else {updatedCart = [...cart, { product, quantity: 1 }];
+    } else {updatedCart = [...cart, { product: cleanProduct, quantity: 1 }];
     }setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
   };

@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +7,7 @@ from backend.routes.user_state import user_route
 from backend.routes.order import order_router
 from backend.routes.OTPs import otp_router
 from backend.routes.product import product_router
+BASE_URI = os.getenv("BASE_URI")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,7 +22,7 @@ app.include_router(otp_router, prefix="/api", tags=["OTP Management"])
 app.include_router(product_router, prefix="/api", tags=["Product Management"])
 app.include_router(user_route, prefix="/api", tags=["User State Management"])
 
-app.add_middleware(CORSMiddleware, allow_origins=["http://127.0.0.1:5000", "http://localhost:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=[BASE_URI], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 @app.get("/api")
 async def root():

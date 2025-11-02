@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./CSS/checkout.css";
-import { Header, Footer } from "./header_footer";
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+import "./../CSS/checkout.css";
+import axios from "axios";
+import { Header, Footer } from "../header_footer";
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const getSavedCart = () => {
   try { return JSON.parse(localStorage.getItem("cart")) || [];}
@@ -69,28 +70,29 @@ const CartCheckout = () => {
   const handleField = (field) => (e) => {setBilling({ ...billing, [field]: e.target.value });};
 	
   const placeOrder = async (e) => {
-		e.preventDefault();
-		const { name, email, phone, address } = billing;
-		if (!name || !email || !phone || !address) { alert("Please fill out all required fields."); return; }
-		const orderDetails = { ...billing, cart, total };
-		try {
-			const response = await fetch(`${BASE_URL}/api/order`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(orderDetails),
-			});
-			const data = await response.json();
-			if (response.status === 409) {
-				alert(data.error || 'User already exists.');
-			} else if (response.ok) {
-				alert('Order placed successfully!');
-				setCart([]); console.log(data)
+    e.preventDefault();
+    const { name, email, phone, address } = billing;
+    if (!name || !email || !phone || !address) {
+      alert("Please fill out all required fields.");
+      return;
+    } const orderDetails = { ...billing, cart, total };
+    try {
+      const response = await axios.post(`${BASE_URL}/api/order`, orderDetails, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }); const data = response.data;
+      if (response.status === 409) alert(data.error || "User already exists.");
+      else if (response.status === 200) {
+        alert("Order placed successfully!");
+        setCart([]);
+        console.log(data);
         navigate("/thankyou", { state: data });
-			} else { alert(`Order confirmation failed: ${data.error || 'Unknown error'}`); }
-		} catch (error) {
-			console.error('Order confirmation error:', error);
-			alert('An error occurred during order confirmation.');}
-	};	
+      } else alert(`Order confirmation failed: ${data.error || "Unknown error"}`);
+    } catch (error) {
+      console.error("Order confirmation error:", error);
+      alert("An error occurred during order confirmation.");
+    }
+  };
 
   return (
     <><Header />

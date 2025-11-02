@@ -1,12 +1,7 @@
-#Root Directory in System Path
-import sys, os
-root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
-if root_path not in sys.path:
-    sys.path.append(root_path)
-
-import subprocess
+import os, subprocess
 import json, base64, qrcode
 from io import BytesIO
+from backend.config import root_path
 
 def encrypt_text(plaintext):
     exe_path = os.path.join(root_path, "dependencies", "AES_Implementation", "build", "encrypt")
@@ -47,12 +42,12 @@ def decrypt_bytes(byte_values):
 def encrypt_dict(data: dict) -> dict:
     json_str = json.dumps(data, separators=(',', ':'))
     cipher_bytes = encrypt_text(json_str)
-    b64_cipher   = base64.b64encode(bytes(cipher_bytes)).decode('ascii')
+    b64_cipher = base64.b64encode(bytes(cipher_bytes)).decode('ascii')
     return {"ciphertext": b64_cipher}
 
 def decrypt_dict(payload: dict) -> dict:
     cipher_bytes = list(base64.b64decode(payload["ciphertext"]))
-    json_str     = decrypt_bytes(cipher_bytes)
+    json_str = decrypt_bytes(cipher_bytes)
     return json.loads(json_str)
 
 def generate_qr(data):

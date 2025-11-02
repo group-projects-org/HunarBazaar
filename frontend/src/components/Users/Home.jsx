@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "./CSS/product.css";
-import "./CSS/slideshow.css";
-import { Header, Footer } from "./header_footer";
+import "./../CSS/product.css";
+import "./../CSS/slideshow.css";
+import { Header, Footer } from "../header_footer";
 import { useNavigate } from "react-router-dom";
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
+import axios from "axios";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -15,13 +16,12 @@ const Home = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       setLoading(true);
-      try{
-        const response = await fetch(`${BASE_URL}/api/get_categories`);
-        const data = await response.json();
-        setCategories(data.categories);
-      }catch(error){
-        setError(error.message);
-      }finally{setLoading(false);}
+      try {
+        const response = await axios.get(`${BASE_URL}/api/get_categories`, {
+          withCredentials: true,
+        }); setCategories(response.data.categories);
+      } catch (error) { setError(error.message);
+      } finally { setLoading(false); }
     }; fetchCategories();
   }, []);
 
@@ -34,7 +34,7 @@ const Home = () => {
   const handleNext = () => {setCurrentSlide((prev) => (prev + 1) % 8);};
 
   return (
-    <div>
+    <>
       {loading && (<>
         <div className="toast-overlay" />
         <div className="toast-message processing">Loading the Data...</div>
@@ -66,7 +66,7 @@ const Home = () => {
         </div>
       </div>
       <Footer />
-    </div>
+    </>
   );
 };
 

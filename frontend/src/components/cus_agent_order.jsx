@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { Header, Footer } from "./header_footer";
 import './CSS/orders.css'
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const ProductCards = ({ cart, editable = false, onQuantityChange }) => {
   if (cart.length === 0) return <p>Your cart is empty.</p>;
@@ -46,33 +47,25 @@ const CusAgentOrder = () => {
     if (entered) setPassword(entered);
     else window.location.href = "/";
   }, [accessLevel]);
-  
+
   useEffect(() => {
     if (!order_id) return;
     if (accessLevel === "protected" && !password) return;
     const abort = new AbortController();
     (async () => {
       try {
-        setLoading(true); setError(null);
+        setLoading(true);
+        setError(null);
         const isProtected = accessLevel === "protected";
-        const url  = `${BASE_URL}${isProtected ? "/api/getOrderData": `/api/getOrderQR?encodedContent=${encodeURIComponent(order_id)}`}`;
-        const res  = await fetch(url, {
-          method : isProtected ? "POST" : "GET",
-          headers: { "Content-Type": "application/json" },
-          body   : isProtected ? JSON.stringify({ order_id, password }) : null,
-          signal : abort.signal
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error || "Unknown error");
-        setResult(json);
+        const url = `${BASE_URL}${isProtected ? "/api/getOrderData": `/api/getOrderQR?order_id=${encodeURIComponent(order_id)}`}`;
+        const res = await axios({method: isProtected ? "POST" : "GET", url, data: isProtected ? { order_id, password } : null, withCredentials: true, headers: { "Content-Type": "application/json" }, signal: abort.signal});
+        setResult(res.data);
       } catch (err) {
-        if (err.name !== "AbortError") setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    })();
-    return () => abort.abort();
-  }, [order_id, accessLevel, password]);      
+        if (axios.isCancel(err)) return;
+        setError(err.response?.data?.error || err.message);
+      } finally { setLoading(false);}
+    })(); return () => abort.abort();
+  }, [order_id, accessLevel, password]);     
 
   if (loading) return (<>
     <div className="toast-overlay" />
@@ -87,8 +80,8 @@ const CusAgentOrder = () => {
         <div className="user-details">
           <h2>Order Details</h2> <hr></hr>
           <span style={{ fontWeight: "bold", fontSize: "20px", textAlign: "center", marginBottom: "20px" }}>{result?.data?.order_id}</span>
-          <div class="cart-total"><span>User ID:</span><span>{result?.data?.user_id}</span></div>
-          <div class="cart-total"><span>Agent ID:</span><span>{result?.data?.agent_id}</span></div>
+          <div className="cart-total"><span>User ID:</span><span>{result?.data?.user_id}</span></div>
+          <div className="cart-total"><span>Agent ID:</span><span>{result?.data?.agent_id}</span></div>
           <span style={{ display: "block", textAlign: "center", marginTop: "20px", fontWeight: "bold", fontSize: "20px" }}>{result?.data?.status}</span>
           <div className="timeline">
             <div className="timeline-item">

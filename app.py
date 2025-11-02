@@ -1,28 +1,39 @@
-import os
-from flask_cors import CORS
-from flask import Flask, jsonify
-from backend.user_state import login_bp, logout_bp, register_bp, initializeAPI
-from backend.order import order_bp
-from backend.OTPs import otp_bp
-from backend.product import product_bp
-from backend.suggestions import suggestion_bp
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+from backend.config import mongo_client
+from backend.routes.user_state import user_route
+from backend.routes.order import order_router
+from backend.routes.OTPs import otp_router
+from backend.routes.product import product_router
 
-app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("🛑 Application starting up")
+    yield # Runs app here
+    print("🛑 Application shutting down")
+    mongo_client.close()
 
-app.register_blueprint(login_bp, url_prefix="/api")
-app.register_blueprint(logout_bp, url_prefix="/api")
-app.register_blueprint(register_bp, url_prefix="/api")
-app.register_blueprint(order_bp, url_prefix="/api")
-app.register_blueprint(otp_bp, url_prefix="/api")
-app.register_blueprint(product_bp, url_prefix="/api")
-app.register_blueprint(suggestion_bp, url_prefix="/api")
+app = FastAPI(title="HunarBazar: E-Commerce", lifespan=lifespan)
+app.include_router(order_router, prefix="/api", tags=["Order Management"])
+app.include_router(otp_router, prefix="/api", tags=["OTP Management"])
+app.include_router(product_router, prefix="/api", tags=["Product Management"])
+app.include_router(user_route, prefix="/api", tags=["User State Management"])
 
-@app.route('/api/initial', methods=['POST'])
-def initial():
-    initializeAPI()
-    return jsonify({"message": "Initial state user_name = None"}), 201
+app.add_middleware(CORSMiddleware, allow_origins=["http://127.0.0.1:5000", "http://localhost:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+@app.get("/api")
+async def root():
+    return {
+        "message": "HunarBazar Backend API",
+        "version": "1.0.0",
+        "status": "running",
+        "endpoints": {
+            "prefix": '/api',
+            "orders": ['/order', '/getOrderData', '/getOrder', '/getOrderQR'],
+        }
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)

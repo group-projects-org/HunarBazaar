@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import ProductModal from './ProductModal';
 import axios from 'axios';
 import './../CSS/product.css';
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const ProductsListed = () => {
   const [loading, setLoading] = useState(false);

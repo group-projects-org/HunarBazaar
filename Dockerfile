@@ -1,18 +1,18 @@
-FROM python:3.11-slim AS runtime
+FROM python:3.11-slim AS base
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-        build-essential            \
-        cmake                      \
-        git                        \
-        ca-certificates            \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    git \
+    ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+FROM base AS builder
+COPY dependencies/AES_Implementation ./dependencies/AES_Implementation
 
 RUN cmake -S dependencies/AES_Implementation \
           -B dependencies/AES_Implementation/build \
@@ -20,11 +20,17 @@ RUN cmake -S dependencies/AES_Implementation \
  && cmake --build dependencies/AES_Implementation/build --config Release \
  && cmake --install dependencies/AES_Implementation/build --prefix /usr/local
 
-EXPOSE 5000
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
+FROM python:3.11-slim AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
-CMD ["python", "app.py"]
+WORKDIR /app
+COPY --from=base /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local /usr/local
 
-RUN ls -lh dependencies/AES_Implementation/build/encrypt \
-         dependencies/AES_Implementation/build/decrypt
+COPY . .
+RUN ls -lh /usr/local/bin || true
+EXPOSE 8000
+ENV PYTHONUNBUFFERED=1
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

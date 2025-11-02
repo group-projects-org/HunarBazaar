@@ -70,6 +70,7 @@ form {
 
 .container h1 {
   font-size: 50px;
+  font-weight: bold;
   margin: 20px 0;
   font-family: 'Great Vibes', cursive;
 }
@@ -80,7 +81,7 @@ form {
 
 .input-box {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   display: flex;
   align-items: flex-start;
   gap: 12px;

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
-import './CSS/product.css';
-import { Header, Footer } from "./header_footer";
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+import './../CSS/product.css';
+import { Header, Footer } from "./../header_footer";
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const ProductsPage = () => {
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,9 @@ const ProductsPage = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`${BASE_URL}/api/product_list`);
+        const response = await axios.get(`${BASE_URL}/api/product_list`, {
+          withCredentials: true,
+        });
         const fetchedProducts = response.data.products;
         setProducts(fetchedProducts);
         const uniqueCategories = [...new Set(fetchedProducts.map(p => p.category))];

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Header, Footer } from "./header_footer";
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+import { Header, Footer } from "../header_footer";
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const OrderCards = ({ result, navigate }) => {
      if (!result || result.length === 0) return <p>No Orders to Show...</p>;
@@ -28,19 +29,18 @@ const Orders = () => {
   useEffect(() => {
     const abort = new AbortController();
     const fetchData = async () => {
-      setLoading(true); setError(null);
+      setLoading(true);
+      setError(null);
       try {
-        const res = await fetch(`${BASE_URL}/api/getOrder`, { signal: abort.signal });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error || "Unknown error");
-        setResult(json.orderDetails);
+        const res = await axios.get(`${BASE_URL}/api/getOrder`, {
+          withCredentials: true,
+          signal: abort.signal,
+        }); setResult(res.data.orderDetails);
       } catch (err) {
-        if (err.name !== "AbortError") setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData(); return () => abort.abort();
+        if (err.name !== "CanceledError" && err.name !== "AbortError") setError(err.response?.data?.detail || err.message);
+      } finally {setLoading(false);}
+    }; fetchData();
+    return () => abort.abort();
   }, []);
 
   useEffect(() => {

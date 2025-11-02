@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
-import LoginRegister from './components/Login';
-import SellerHome from './components/Seller/SellerHome';
-import Home from './components/Home';
-import ProductsPage from './components/productPage';
-import CartCheckout from './components/cart'
-import ThankYou from './components/thankyou';
-import CusAgentOrder from './components/cus_agent_order';
-import Orders from './components/orders';
-import ProductsListed from './components/Seller/Products';
+import LoginRegister from './components/Login.jsx';
+import SellerHome from './components/Sellers/SellerHome.jsx';
+import Home from './components/Users/Home.jsx';
+import ProductsPage from './components/Users/productPage.jsx';
+import CartCheckout from './components/Users/cart.jsx'
+import ThankYou from './components/Users/thankyou.jsx';
+import CusAgentOrder from './components/cus_agent_order.jsx';
+import Orders from './components/Users/orders.jsx';
+import ProductsListed from './components/Sellers/Products.jsx';
 
 function App() {  
   return (

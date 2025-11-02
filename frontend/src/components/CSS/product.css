@@ -136,6 +136,13 @@
   font-family: Arial, sans-serif;
 }
 
+.product-card button{
+  border: 1.5px solid #d4d0d0;
+  background-color: #d4d0d0;
+  padding: 2px 5px;
+  border-radius: 10%;
+}
+
 /*---------------------------------------CART PAGE FORMATTING-------------------------------------*/
 .quantity-container {
   display: flex;

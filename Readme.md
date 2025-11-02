@@ -1,5 +1,7 @@
 # TRENDIFY : E-CLOTHING STORE
 
+INTITAL: pip install Flask Flask-Cors pymongo python-dotenv qrcode[pil] sendgrid twilio
+
 [![Store Link](https://img.shields.io/badge/Visit%20Store-TRENDIFY-28a745?style=for-the-badge&logo=shopping-cart&logoColor=white)](https://trendify-e-commerce-store-blush.vercel.app/)
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?&logo=open-source-initiative&logoColor=white)](LICENSE)

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { Header, Footer } from "./header_footer";
-import './CSS/thankyou.css'
+import { Header, Footer } from "../header_footer";
+import './../CSS/thankyou.css'
 
 export default function ThankYou () {
   const navigate = useNavigate();

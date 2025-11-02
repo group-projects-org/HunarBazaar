@@ -1,9 +1,10 @@
 import './CSS/Header_Footer.css';
-import React, { useState } from 'react';
+import axios from 'axios';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Package, Users, DollarSign } from 'lucide-react';
 import { FaHome, FaInfoCircle, FaBoxOpen, FaShoppingCart, FaClipboardList } from "react-icons/fa";
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const Header = ( {a}) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -12,9 +13,9 @@ const Header = ( {a}) => {
   const handleLogoutClick = async () => {
     setError("Logging Out...");
     try {
-      const response = await fetch(`${BASE_URL}/api/logout`, {
-        method: 'POST',
+      const response = await axios.post(`${BASE_URL}/api/logout`, null, {
         headers: {'Content-Type': 'application/json',},
+        withCredentials: true,
       });
       const result = await response.json();
       if (result.email) {

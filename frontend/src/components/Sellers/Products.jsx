@@ -24,9 +24,9 @@ const ProductsListed = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        const user_id = localStorage.getItem("user_id");
-        let response = await axios.get(`${BASE_URL}/api/seller_products_list`, { params: { seller_id: user_id }});
-        const fetchedProducts = response.data.products;
+        let response = await axios.get(`${BASE_URL}/api/seller_products_list`, { 
+          withCredentials: true
+        }); const fetchedProducts = response.data.products;
         setProducts(fetchedProducts);
         const uniqueCategories = [...new Set(fetchedProducts.map(p => p.category))];
         setSellerCategories(['All Categories', ...uniqueCategories]);
@@ -61,9 +61,28 @@ const ProductsListed = () => {
     [filteredProducts, currentPage]
   );  
 
-  const handleSaveProduct = () => {
-    console.log('Saving Product:', newProduct);
-    setShowModal(false);
+  const handleSaveProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('name', newProduct.name);
+      formData.append('price', newProduct.price);
+      formData.append('category', newProduct.category);
+      formData.append('description', newProduct.description);
+      formData.append('variants', JSON.stringify(newProduct.variants));
+      if (newProduct.images && newProduct.images.length > 0) {
+        newProduct.images.forEach((file) => {formData.append('images', file);});
+      } const response = await axios.post(`${BASE_URL}/api/add_product`,formData,{
+        withCredentials: true 
+      }); if (response.status === 200 || response.status === 201) {
+        alert('✅ Product saved successfully!');
+        setShowModal(false)
+        setNewProduct({name: '', price: '', category: '', description: '', variants: [], images: [] });
+      } else { alert('❌ Failed to save product. Try again.');}
+    } catch (err) {
+      console.error('Error saving product:', err);
+      alert('⚠️ Error while saving product');
+    }
   };
 
   return (

@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { X, Upload, Save } from 'lucide-react';
+import axios from 'axios';
 import './../CSS/add_product.css';
+const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const ProductModal = ({ show, onClose, newProduct, setNewProduct, onSave, categories, isEditing = false }) => {
   const [selectedSize, setSelectedSize] = useState('');

@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11-slim'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         IMAGE_NAME = "hunarbaazar-backend"
@@ -15,47 +10,76 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/group-projects-org/HunarBazaar.git'
+                git branch: 'master', url: 'https://github.com/group-projects-org/HunarBazaar.git'
             }
         }
 
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    sh '''
-                        apt-get update -y
-                        apt-get install -y npm
-                        npm install
-                        npm run build
+                    bat '''
+                    call npm install
+                    call npm run build
                     '''
                 }
             }
         }
 
+        stage('Start Docker') {
+            steps {
+                powershell '''
+                Write-Host "Checking if Docker is already running..."
+
+                try {
+                    docker info | Out-Null
+                    Write-Host "✅ Docker is already running. Skipping start."
+                } catch {
+                    Write-Host "⚙️ Docker not running. Starting Docker Desktop..."
+                    Start-Process "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe"
+                    Write-Host "⏳ Waiting for Docker daemon to start..."
+                    $maxTries = 20
+                    for ($i = 0; $i -lt $maxTries; $i++) {
+                        try {
+                            docker info | Out-Null
+                            Write-Host "✅ Docker is ready!"
+                            exit 0
+                        } catch {
+                            Start-Sleep -Seconds 5
+                            Write-Host "Docker not ready yet..."
+                        }
+                    }
+                    Write-Error "❌ Docker did not start in time."
+                    exit 1
+                }
+                '''
+            }
+        }
+
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                bat 'docker build -t %IMAGE_NAME% .'
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                sh '''
-                    docker run --rm $IMAGE_NAME pytest --maxfail=1 --disable-warnings -q
+                bat '''
+                docker run --rm %IMAGE_NAME% sh -c "pip install pytest && pytest --maxfail=1 --disable-warnings -q"
                 '''
             }
         }
 
         stage('Push to DockerHub') {
             when {
-                branch 'main'
+                branch 'master'
             }
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKERHUB_PASS')]) {
-                    sh '''
-                        echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
-                        docker tag $IMAGE_NAME $DOCKERHUB_USER/$IMAGE_NAME:latest
-                        docker push $DOCKERHUB_USER/$IMAGE_NAME:latest
+                    bat '''
+                    echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin
+                    docker tag %IMAGE_NAME% %DOCKERHUB_USER%/%IMAGE_NAME%:latest
+                    docker push %DOCKERHUB_USER%/%IMAGE_NAME%:latest
                     '''
                 }
             }
@@ -64,13 +88,12 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent(['your-ec2-ssh-key']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@your-server-ip '
-                            docker pull $DOCKERHUB_USER/$IMAGE_NAME:latest &&
-                            docker stop $CONTAINER_NAME || true &&
-                            docker rm $CONTAINER_NAME || true &&
-                            docker run -d --name $CONTAINER_NAME -p 8000:8000 $DOCKERHUB_USER/$IMAGE_NAME:latest
-                        '
+                    bat '''
+                    ssh -o StrictHostKeyChecking=no ubuntu@your-server-ip ^
+                        "docker pull %DOCKERHUB_USER%/%IMAGE_NAME%:latest && ^
+                        docker stop %CONTAINER_NAME% || true && ^
+                        docker rm %CONTAINER_NAME% || true && ^
+                        docker run -d --name %CONTAINER_NAME% -p 8000:8000 %DOCKERHUB_USER%/%IMAGE_NAME%:latest"
                     '''
                 }
             }
@@ -79,7 +102,7 @@ pipeline {
 
     post {
         always {
-            echo "✅ Pipeline completed."
+            echo "Pipeline completed."
         }
     }
 }

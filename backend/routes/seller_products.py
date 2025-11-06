@@ -43,7 +43,7 @@ async def add_product(request: Request, name: str = Form(...), price: float = Fo
             for img in images:
                 upload_result = cloudinary.uploader.upload(img.file, folder="HunarBaazar_Products", resource_type="image")
                 image_urls.append(upload_result["secure_url"])
-        image_urls.append(image_links)
+        for urls in image_urls: image_urls.append(urls)
         last_product = await collection.find_one(sort=[("product_id", -1)])
         new_product_id = (last_product["product_id"] + 1) if last_product else 1
         new_product = {"product_id": new_product_id, "name": name, "price": price, "category": category, "description": description, "variants": variants_data, "tags": tags_data, "images": image_urls, "seller_id": seller_id }

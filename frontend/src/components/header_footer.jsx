@@ -86,7 +86,7 @@ const Header = ( {userType}) => {
         </div>
       </div>
 
-      <Navbar tabs={userType? sellerTabs: userTabs} />
+      <Navbar tabs={userType == "sellers"? sellerTabs: userTabs} />
     </div>
   );
 };

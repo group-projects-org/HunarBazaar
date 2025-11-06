@@ -33,7 +33,6 @@ const ProductsListed = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerLoad = 60;
 
-  // ✅ Fetch seller products and categories
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -107,6 +106,7 @@ const ProductsListed = () => {
       formData.append('category', newProduct.category);
       formData.append('description', newProduct.description);
       formData.append('variants', JSON.stringify(newProduct.variants));
+      formData.append('image_links', JSON.stringify(newProduct.image_links))
 
       if (newProduct.images && newProduct.images.length > 0) {
         newProduct.images.forEach(file => formData.append('images', file));

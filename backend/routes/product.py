@@ -1,9 +1,6 @@
-from fastapi import APIRouter, Request, UploadFile, Form, File
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from typing import List, Optional
 from backend.config import db, logger
-from backend.JWT import get_current_user
-import json
 
 collection = db["product_list"]
 seller_collection = db["seller_list"]
@@ -12,7 +9,8 @@ product_router = APIRouter()
 @product_router.get('/product_list')
 async def product_list():
     try:
-        products = await collection.find({}, {"_id": 0}).to_list(length=None)
+        cursor = collection.find({}, {"_id": 0, "product_id": 1, "name": 1, "category": 1, "price": 1, "images": 1})
+        products = await cursor.to_list(length=None)
         for product in products:
             if "product_id" in product:
                 product["id"] = product.pop("product_id")
@@ -30,49 +28,31 @@ async def get_categories():
     try:
         categories = await collection.distinct("category")
         categories.sort()
-        logger.info(f"Categories fetched: {categories}")
         return JSONResponse(content={"categories": categories}, status_code=200)
     except Exception as e:
         logger.error(f"Error fetching categories: {e}")
         return JSONResponse(content={"message": "Fetching Error", "error": str(e)}, status_code=500)
 
-@product_router.get('/seller_products_list')
-async def seller_products_list(request: Request):
-    logger.info("🟢 Seller initiated get product list request...")
-    payload = get_current_user(request)
-    seller_id = payload.get("user_id")
+@product_router.get("/product")
+async def get_productDetails(request: Request):
+    params = request.query_params
+    product_id = params.get("product_id")
+    limit = int(params.get("limit", 20))
+    if not product_id: return JSONResponse(content={"error": "product_id required"}, status_code=400)
     try:
-        if not seller_id: return JSONResponse(content={"message": "seller_id required"}, status_code=400)
-        products = await collection.find({"seller_id": seller_id}, {"_id": 0}).to_list(length=None)
-        for product in products:
-            if "product_id" in product: product["id"] = product.pop("product_id")
-            if "images" in product and isinstance(product["images"], list) and product["images"]:
-                product["image"] = str(product["images"][0])
-                del product["images"]
-        return JSONResponse(content={"products": products}, status_code=200)
-    except Exception as e:
-        logger.error(f"Error fetching seller products: {e}")
-        return JSONResponse(content={"message": "Fetching Error", "error": str(e)}, status_code=500)
+        product_id = int(product_id)
+        product = await collection.find_one({"product_id": product_id}, {"_id": 0, "tags": 0})
+        if not product: return JSONResponse(content={"error": "Product not found"}, status_code=404)
+        if "rating" in product and product["rating"] is not None:
+            try: product["rating"] = float(product["rating"].to_decimal())
+            except Exception: product["rating"] = float(product["rating"])
 
-@product_router.post("/add_product")
-async def add_product(request: Request, name: str = Form(...), price: float = Form(...), category: str = Form(...), description: str = Form(...), variants: str = Form(...), tags: Optional[str] = Form(None), images: Optional[List[UploadFile]] = File(None)):
-    try:
-        payload = get_current_user(request)
-        seller_id = payload.get("user_id")
-        if not seller_id: return JSONResponse(content={"message": "Unauthorized"}, status_code=401)
-        variants_data = json.loads(variants)
-        tags_data = json.loads(tags) if tags else []
-        image_urls = []
-        if images:
-            for img in images:
-                image_urls.append(f"/uploads/{img.filename}")
-        last_product = await collection.find_one(sort=[("product_id", -1)])
-        new_product_id = (last_product["product_id"] + 1) if last_product else 1
-        new_product = {"product_id": new_product_id, "name": name, "price": price, "category": category,"description": description, "variants": variants_data, "tags": tags_data, "images": image_urls, "seller_id": seller_id}
-        await collection.insert_one(new_product)
-        update_result = await seller_collection.update_one({"user_id": seller_id}, {"$addToSet": {"products": new_product_id}})
-        logger.info(f"✅ New product '{name}' added by seller {seller_id}")
-        return JSONResponse(content={"message": "Product added successfully", "product_id": new_product_id,  "updated_seller": update_result.modified_count }, status_code=201)
+        all_reviews = product.get("reviews", [])
+        total_reviews = len(all_reviews)
+        product["reviews"] = all_reviews[:limit]
+        product["reviewCount"] = total_reviews
+        product["reviewsLimitedTo"] = limit
+        return JSONResponse(content=product, status_code=200)
     except Exception as e:
-        logger.exception("Error adding new product")
-        return JSONResponse(content={"message": "Add Product Error", "error": str(e)}, status_code=500)
+        print("Error fetching product details:", e)
+        return JSONResponse(content={"error": "Invalid product_id or server error"}, status_code=500)

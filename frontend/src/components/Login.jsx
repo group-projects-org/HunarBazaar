@@ -32,6 +32,22 @@ const LoginRegister = () => {
      };
    }, []);
 
+   useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/verify-token`, {
+          withCredentials: true,
+        }); if (res.data.valid) {
+          console.log("✅ Auto-login success:", res.data);
+          localStorage.setItem("username", res.data.username);
+          navigate(res.data.userType === "sellers" ? "/seller/Home" : res.data.userType === "agents" ? "/agent/" : "/Home");
+        }
+      } catch (err) {
+        console.log("❌ No active session:", err.response?.data?.message || err.message);
+      }
+    }; verifyToken();
+  }, [navigate]);
+
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -79,11 +95,12 @@ const LoginRegister = () => {
       const response = await axios.post(`${BASE_URL}/api/login`, formData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
-      }); 
+      });
       const data = response.data;
       console.log("Login successful:", data);
-      localStorage.setItem("user_email", data.user_email);
-      navigate(formData.userType !== "sellers" ? "/Home" : "/seller/");
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("cart", data.cart);
+      navigate(formData.userType !== "sellers" ? "/Home" : "/seller/Home");
     } catch (error) {
       if (error.response) alert(`Login failed: ${error.response.data.error || "Unknown error"}`);
       else alert("An error occurred during login.");
@@ -182,11 +199,10 @@ const LoginRegister = () => {
   return (
     <> {showDevModal && (
       <div className="fixed inset-0 z-5 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-300" onClick={() => setShowDevModal(false)}>
-        <div className="bg-white/95 p-6 rounded-2xl shadow-2xl text-center max-w-sm w-[90%] border border-gray-200 animate-fadeIn" onClick={(e) => e.stopPropagation()}>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2"> ⚠️ Development Mode</h2>
-          <p className="text-gray-600 mb-1"> This website is currently in development phase.</p>
-          <p className="text-gray-600 mb-3"> Verification features are disabled for testing users.</p>
-          <div className="bg-gray-100 rounded-xl p-3 mb-4">
+        <div className="bg-white/95 rounded-2xl shadow-2xl text-center border border-gray-200 animate-fadeIn w-[35%]" style={{padding: "24px"}} onClick={(e) => e.stopPropagation()}>
+          <h2 className="text-2xl font-semibold text-gray-800" style={{marginBottom: "8px"}}> ⚠️ Development Mode</h2>
+          <p className="text-gray-600 wrap-break-word" style={{marginBottom: "4px"}}> This website is currently in development phase. Verification features are disabled for testing users. </p> <p className="text-gray-600 wrap-break-word" style={{marginBottom: "12px"}}>You can checkout our website via follow crendentials for all roles including <b>User</b>, <b>Seller</b> and <b>Agent</b>:</p>
+          <div className="bg-gray-100 rounded-xl p-3" style={{marginBottom: "16px"}}>
             <p className="text-gray-700 text-sm">
               <strong>Username:</strong>{" "}
               <span className="text-blue-600 font-medium">user</span> <br />
@@ -194,8 +210,8 @@ const LoginRegister = () => {
               <span className="text-blue-600 font-medium">user123</span>
             </p>
           </div>
-          <button onClick={() => { setShowDevModal(false); setIsActive(false); setFormData({...formData, username: "user", password: "user123", }); }} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md transition-all duration-200" > Login Now </button>
-          <p className="text-xs text-gray-500 mt-5 italic">For testing purposes only — no real data is stored.</p>
+          <button onClick={() => { setShowDevModal(false); setIsActive(false); setFormData({...formData, username: "user", password: "user123", }); }} className=" bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md transition-all duration-200" style={{padding: "8px 20px"}}> Login Now </button>
+          <p className="text-xs text-gray-500 italic" style={{marginTop: "20px"}}>For testing purposes only — no real data is stored.</p>
         </div>
       </div>
     )} <div className={`container ${isActive ? 'active' : ''}`}>

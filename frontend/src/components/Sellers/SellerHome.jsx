@@ -1,11 +1,10 @@
-import "./../CSS/product.css";
 import { Header, Footer } from "./../header_footer";
 import { Outlet } from "react-router-dom";
 
 const Home = () => {
   return (
     <div>
-      <Header a={true}/>
+      <Header userType={"sellers"}/>
       <Outlet />
       <Footer />
     </div>

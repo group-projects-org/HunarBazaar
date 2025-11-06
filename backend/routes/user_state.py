@@ -1,8 +1,9 @@
-import os
 import uuid
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr
+
+from backend.JWT import get_current_user
 from backend.config import db, logger
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -32,9 +33,22 @@ async def check_username(request: Request):
         print("Error checking username:", e)
         return JSONResponse({"error": "Server error"}, status_code=500)
 
+@user_route.get("/verify-token")
+def verify_token(request: Request):
+    token = request.cookies.get("access_token")
+    if not token: return JSONResponse(status_code=401, content={"message": "Token missing"})
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        username = payload["username"]
+        user_type = payload["userType"]
+        return JSONResponse(content={"valid": True, "username": username, "userType": user_type})
+    except jwt.ExpiredSignatureError:
+        return JSONResponse(status_code=401, content={"message": "Token expired"})
+    except:
+        return JSONResponse(status_code=401, content={"message": "Invalid token"})
+
 @user_route.post('/login')
 async def login(request: Request):
-    logger.info("\n🟢 User initiated login request...")
     data = await request.json()
     username = data.get("username")
     userType = data.get("userType")
@@ -55,7 +69,7 @@ async def login(request: Request):
 
     token_data = {"user_id": user_id, "username": document["username"], "email": document["email"], "phone": document["phone"], "userType": userType, }
     access_token = create_access_token(data=token_data)
-    response = JSONResponse(content={"message": "Login successful", "user_email": document["email"]})
+    response = JSONResponse(content={"message": "Login successful", "username": document["username"], "cart": document.get("cart", [])})
     response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="None")
     return response
 
@@ -68,13 +82,12 @@ class UserDetails(BaseModel):
 
 @user_route.post("/register")
 async def register(user: UserDetails):
-    logger.info("\n🟢 User initiated register request...")
     username = user.username
     email = user.email
     phone = user.phone
     userType = user.userType
 
-    if userType not in ["users", "agents"]: raise HTTPException(status_code=400, detail="Invalid userType")
+    if userType not in ["users", "sellers"]: raise HTTPException(status_code=400, detail="Invalid userType")
     collection = db[userType]
     existing_user = await collection.find_one({"$or": [{"username": username}, {"email": email}, {"phone": phone}]})
 
@@ -88,12 +101,23 @@ async def register(user: UserDetails):
     user_data.pop("userType", None)
 
     await collection.insert_one(user_data)
-    logger.info(f"✅ User {username} registered successfully.")
     return JSONResponse(content={"message": "Registration Successful"}, status_code=200)
 
-
 @user_route.post("/logout")
-async def logout():
-    response = JSONResponse(content={"message": "Logout successful"})
-    response.delete_cookie("access_token")
-    return response
+async def logout(request: Request):
+    try:
+        data = await request.json()
+        payload = get_current_user(request)
+        user_id = payload.get("user_id")
+        user_type = payload.get("userType")
+        cart = data.get("cart", [])
+        collection = db[user_type]
+        if user_type == "users": await collection.update_one({"user_id": user_id}, {"$set": {"cart": cart}})
+        else: await collection.update_one({"agent_id": user_id}, {"$set": {"cart": cart}})
+
+        response = JSONResponse(content={"message": "Logout successful"})
+        response.delete_cookie(key="access_token", httponly=True, secure=True, samesite="None", path="/")
+        return response
+    except Exception as e:
+        print("Logout error:", e)
+        return JSONResponse(status_code=500, content={"error": str(e)})

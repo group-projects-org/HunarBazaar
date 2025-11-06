@@ -7,6 +7,8 @@ from backend.routes.user_state import user_route
 from backend.routes.order import order_router
 from backend.routes.OTPs import otp_router
 from backend.routes.product import product_router
+from backend.routes.user import user_data_route
+from backend.routes.seller_products import seller_product_router
 BASE_URI = os.getenv("BASE_URI")
 
 @asynccontextmanager
@@ -21,6 +23,8 @@ app.include_router(order_router, prefix="/api", tags=["Order Management"])
 app.include_router(otp_router, prefix="/api", tags=["OTP Management"])
 app.include_router(product_router, prefix="/api", tags=["Product Management"])
 app.include_router(user_route, prefix="/api", tags=["User State Management"])
+app.include_router(user_data_route, prefix="/api", tags=["User Data Management"])
+app.include_router(seller_product_router, prefix="/api", tags=["Seller Product Data Management"])
 
 app.add_middleware(CORSMiddleware, allow_origins=[BASE_URI], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 

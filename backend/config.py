@@ -31,13 +31,21 @@ MONGO_DB_NAME = "Secure-Delivery-Data"
 mongo_client = AsyncIOMotorClient(MONGO_URI)
 db = mongo_client[MONGO_DB_NAME]
 
-
 # -------------------------
 # JWT Configuration
 # -------------------------
 SECRET_KEY = "khajan_bhatt"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+
+# -------------------------
+# Cloudinary Configuration
+# -------------------------
+import cloudinary
+CLOUDINARY_CLOUD_NAME=os.getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY=os.getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET=os.getenv("CLOUDINARY_API_SECRET")
+cloudinary.config(cloud_name=CLOUDINARY_CLOUD_NAME, api_key=CLOUDINARY_API_KEY, api_secret=CLOUDINARY_API_SECRET, secure=True)
 
 # -------------------------
 # File Upload Configuration

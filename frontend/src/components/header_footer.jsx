@@ -1,30 +1,42 @@
-import './CSS/Header_Footer.css';
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Package, Users, DollarSign } from 'lucide-react';
 import { FaHome, FaInfoCircle, FaBoxOpen, FaShoppingCart, FaClipboardList } from "react-icons/fa";
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
-const Header = ( {a}) => {
+const Header = ( {userType}) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [error, setError] = useState(null);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const userTabs = [
+    ["/Home", FaHome, "Home"],
+    ["/About", FaInfoCircle, "About"],
+    ["/Products", FaBoxOpen, "Products"],
+    ["/CartCheckout", FaShoppingCart, "Cart"],
+    ["/Orders", FaClipboardList, "Orders"]
+  ]; 
+  const sellerTabs = [
+  ["/seller/Dashboard", TrendingUp, "Dashboard"],
+  ["/seller/Products", Package, "Product"],
+  ["/seller/Orders", Users, "Orders"],
+  ["/seller/Analytics", DollarSign, " Analytics"]
+  ]; 
   const handleLogoutClick = async () => {
     setError("Logging Out...");
+    const cart = localStorage.getItem('cart');
     try {
-      const response = await axios.post(`${BASE_URL}/api/logout`, null, {
-        headers: {'Content-Type': 'application/json',},
+      const response = await axios.post(`${BASE_URL}/api/logout`, { cart }, {
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-      const result = await response.json();
-      if (result.email) {
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("user_email");
+      const result = response.data;
+      if (result.message === "Logout successful") {
         localStorage.removeItem("username");
-        localStorage.removeItem("phone");
-        localStorage.removeItem("userType");
+        localStorage.removeItem("cart");
         setDropdownVisible(false);
+        navigate('/');
       } else {
         console.error('Logout failed');
         setError("Failed to Logout");
@@ -32,8 +44,17 @@ const Header = ( {a}) => {
     } catch (error) {
       console.error('Error during logout:', error);
       setError("Error during Logout");
-    }setError(null); navigate('/');
-  };  
+    } finally { setError(null); }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) 
+        setDropdownVisible(false);
+    }; if (dropdownVisible) document.addEventListener("mousedown", handleClickOutside);
+    else  document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownVisible]);
 
   return (
     <div>
@@ -43,74 +64,104 @@ const Header = ( {a}) => {
           <div className="toast-message error" onClick={() => {if (error !== "Logging Out...") setError(null);}}>{error}</div>
         </>
       )}
-      <div className="header">
-        <div className="left-section">
-          <img className="logo" src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
-          <h1 style={{ fontFamily: "'Eagle Lake', cursive" }}>हुनरBazaar</h1>
+      <div className="relative flex justify-between items-center h-[60px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-linear-to-r from-[#3cbf4e] to-[#2ecc71] z-1000">
+
+        <div className="flex items-center gap-[0.8rem]">
+          <img className="h-[60px] w-auto object-contain" style={{marginLeft: "15px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
+          <h1 className="text-[1.6rem] font-bold text-black" style={{ fontFamily: "Eagle Lake, cursive" }}>हुनरBazaar</h1>
         </div>
-        <small className="slogan">"Skill in every hand, Market at every doorstep"</small>
-        <div className="user-info" onClick={() => setDropdownVisible(!dropdownVisible)}>
-          <span>{localStorage.getItem("user_email")}</span>
-          <img src={'/assets/User.jpg'} alt="User" className="user-avatar" />
+
+        <div className="absolute left-1/2 transform -translate-x-1/2">
+          <small className="text-[14px] text-black font-light leading-[1.2] tracking-[1px] uppercase text-center whitespace-nowrap" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }} > "Skill in every hand, Market at every doorstep" </small>
+        </div>
+
+        <div ref={dropdownRef} className="flex items-center gap-4 text-black relative cursor-pointer" style={{marginRight: "15px"}} onClick={() => setDropdownVisible(!dropdownVisible)} >
+          <span className="overflow-hidden hover:text-[#333]" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>{localStorage.getItem("username")}</span>
+          <img src={'/assets/User.jpg'} alt="User" className="w-8 h-8 rounded-[50%] bg-[#2563eb] text-white flex items-center justify-center font-medium" />
           {dropdownVisible && (
-            <div className="dropdown-menu">
-              <button >View Profile</button>
-              <button onClick={handleLogoutClick}>Logout</button>
-            </div>
-          )}
+          <div className="absolute top-full whitespace-nowrap right-0 bg-white shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-sm z-10" style={{padding: "8px"}}>
+            <button className="w-full block text-left cursor-pointer hover:bg-[#e4e4e4] rounded-sm bg-transparent border-none" style={{padding: "8px"}}>View Profile </button>
+            <button onClick={handleLogoutClick} className="w-full block text-left cursor-pointer rounded-sm hover:bg-[#e4e4e4] bg-transparent border-none" style={{padding: "8px"}}> Logout </button>
+          </div> )}
         </div>
       </div>
-      {a ? <SellerNavbar /> : <Navbar />}
+
+      <Navbar tabs={userType? sellerTabs: userTabs} />
     </div>
   );
 };
 
-const Navbar = () => {
-  return (<nav className="navbar">
-    <a href="/Home"><FaHome /> Home</a>
-    <a href="/Home"><FaInfoCircle /> About</a>
-    <a href="/Products"><FaBoxOpen /> Products</a>
-    <a href="/CartCheckout"><FaShoppingCart /> Cart</a>
-    <a href="/Orders"><FaClipboardList /> Orders</a>
-  </nav>)
-}
-const SellerNavbar = () => {
-  return (
-    <nav className="navbar">
-      <a href="/seller/Dashboard"><TrendingUp size={18} /> Dashboard</a>
-      <a href="/seller/Products"><Package size={18} /> Product</a>
-      <a href="/seller/Orders"><Users size={18} /> Orders</a>
-      <a href="/seller/Analytics"><DollarSign size={18} /> Analytics</a>
-    </nav>
-  );
-};
+const NavLink = ({ href, icon: Icon, label }) => (
+  <a href={href} className="inline-flex items-center gap-2 text-[16px] no-underline text-white bg-transparent rounded-[7px] transition-colors duration-300 hover:bg-[#3cbf4e] hover:text-white" style={{"padding": "6px 10px"}}
+  > <Icon /> {label} </a>
+);
+
+const Navbar = ({ tabs }) => (
+  <nav className="flex justify-center items-center gap-5 bg-[#444] shadow-[0_4px_6px_rgba(0,0,0,0.1)]" style={{"padding": "10px"}}>
+    {tabs.map(([href, Icon, label]) => (
+      <NavLink key={label} href={href} icon={Icon} label={label} />
+    ))}
+  </nav>
+);
 
 const Footer = () => {
-     return (
-       <footer className="footer">
-         <div className="additional-section">
-           <div className="featured">
-             <h3>Special Offers</h3>
-             <p>Check out our latest offers on clothing and apparel!</p>
-           </div>
-           <div className="newsletter">
-             <h3>Subscribe to Our Newsletter</h3>
-             <form action="/subscribe" method="POST">
-               <input type="email" defaultValue={localStorage.getItem("user_email")} required />
-               <button type="submit">Subscribe</button>
-             </form>
-           </div>
-           <div className="social-media">
-             <h3>Connect With Developer</h3>
-             <a href="https://www.linkedin.com/in/khajanbhatt/" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a>
-             <a href="https://github.com/Khajan38/" target="_blank" rel="noopener noreferrer">Github Repositories</a>
-             <a href="https://khajan38.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Portfolio Website</a>
-             <a href="mailto:tanujbhatt8279@gmail.com" target="_blank" rel="noopener noreferrer">khajan@gmail.com</a>
-           </div>
-         </div>
-         <p>&copy; {new Date().getFullYear()} <strong>My E-Clothing Website</strong>. All rights reserved.</p>
-       </footer>
-     );
-   };
+  const [userEmail, setUserEmail] = useState(null);
+  const [subscribed, setSubscribed] = useState(false);
+  const links = [
+    ["khajan_bhatt", "https://www.linkedin.com/in/khajanbhatt/", "https://cdn-icons-png.flaticon.com/512/174/174857.png"],
+    ["Khajan38", "https://github.com/Khajan38/", "https://cdn-icons-png.flaticon.com/512/733/733553.png"],
+    ["Khajan Bhatt", "https://khajan38.vercel.app/", "https://cdn-icons-png.flaticon.com/512/841/841364.png"],
+    ["tanujbhatt8279@gmail.com", "mailto:tanujbhatt8279@gmail.com", "https://cdn-icons-png.flaticon.com/512/732/732200.png"],
+  ];
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/userData`, {
+          withCredentials: true,
+        }); const userData = response.data.data;
+        setUserEmail(userData.email || "");
+        setSubscribed(userData.subscribed || false);
+      } catch (error) { console.error("❌ Error fetching user data:", error);}
+    }; fetchUserData();
+  }, []);
+
+  const handleSubscription = async (e) =>{
+  e.preventDefault();
+    try {
+      await axios.post(`${BASE_URL}/api/subscribe`, { subscribed }, {
+        withCredentials: true,
+      }); setSubscribed(!subscribed);
+    } catch (error) { console.error("❌ Error fetching user data:", error);}
+  }
+
+  return (
+    <footer>
+      <div className="flex justify-around bg-[#f8f8f8] gap-5 overflow-hidden" style={{padding: "20px"}}>
+        <div className="flex-1 flex flex-col text-center w-full">
+          <h3 className='text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Special Offers</h3>
+          <p className="text-[1rem] text-[#666666] block w-[90%] leading-relaxed" style={{margin: "2px auto auto auto", fontFamily: "'Segoe UI', sans-serif"}}>Check out our latest offers on clothing and apparel! <b>NEW ARRIVALS and SPECIAL COMBO OFFERS</b> designed just for you !!!</p>
+        </div>
+        <div className="flex-1 flex flex-col text-center">
+          <h3 className='text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Subscribe to Our Newsletter</h3>
+          <form onSubmit={handleSubscription}>
+            <input type="email" defaultValue={userEmail} className="text-[1rem] text-[#666666] block w-[80%] rounded-[5px] border border-[#bcb9b9]" style={{margin: "auto auto 14px auto", padding: "10px"}} required />
+            <button type="submit" className={`${subscribed ? "bg-red-500 hover:bg-red-600" : "bg-[#3cbf4e] hover:bg-[#45a049]"} text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)]`} style={{padding: "8px 12px"}}>{subscribed? "Cancel" : "Subscribe"}</button>
+          </form>
+        </div>
+        <div className="flex-1 flex flex-col text-center">
+          <h3 className='text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Connect With Developer</h3>
+          {links.map(([name, url, icon], idx)=> {
+          return (
+            <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="text-[#45a049] hover:text-black transition-colors duration-300 no-underline text-[0.9rem] flex items-center justify-start wrap-break-all " style={{marginBottom: "7px", paddingLeft: "20%", fontFamily: "Poppins, sans-serif"}} >
+              <img className="w-[25px] h-[25px]" style={{margin: "0px 8px"}}src={icon} alt={name} /> {name} 
+            </a>
+          );
+        })}
+        </div>
+      </div>
+      <p className="text-center bg-[#555555] text-white relative bottom-0 width-full" style={{padding: "15px", fontFamily: "Poppins, sans-serif"}}>&copy; {new Date().getFullYear()}<b> | My E-Clothing Website </b> | All rights reserved</p>
+    </footer>
+  );
+};
 
 export { Header, Footer };

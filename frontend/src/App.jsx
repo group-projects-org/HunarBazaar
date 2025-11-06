@@ -8,6 +8,7 @@ import ThankYou from './components/Users/thankyou.jsx';
 import CusAgentOrder from './components/cus_agent_order.jsx';
 import Orders from './components/Users/orders.jsx';
 import ProductsListed from './components/Sellers/Products.jsx';
+import ProductDetail from './components/productDetail.jsx'
 
 function App() {  
   return (
@@ -15,14 +16,14 @@ function App() {
       <Route path="/Home" element={<Home />} />
       <Route path="/" element={<LoginRegister />} />
       <Route path="/Products" element={<ProductsPage />} />
+      <Route path="/Products/:product_id/:user_type" element={<ProductDetail />} />
       <Route path="/CartCheckout" element={<CartCheckout />} />
       <Route path="/thankyou" element={<ThankYou />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/OrderData" element={<CusAgentOrder />} />
 
-      <Route path="/seller" element={<SellerHome />}>
-        <Route path="Products" element={<ProductsListed />} />
-      </Route>
+      <Route path="/seller/Home" element={<SellerHome />} />
+      <Route path="/seller/Products" element={<ProductsListed />} />
 
     </Routes>
   );

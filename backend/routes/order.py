@@ -44,7 +44,6 @@ class OrderRequest(BaseModel):
 
 @order_router.post("/order")
 async def set_order(request: Request, data: OrderRequest):
-    logger.info("🟢 User initiated order request...")
     payload = get_current_user(request)
     user_id = payload.get("user_id")
 
@@ -76,11 +75,9 @@ async def set_order(request: Request, data: OrderRequest):
             "return_policy": f"{randint(3, 30)} days return policy",
             "transaction_id": str(uuid4()) if result["payment_status"] == "Paid" else "",
         }
-        logger.info("🔒 Starting encryption process...")
         cipher_payload = await run_in_threadpool(encrypt_dict, encrypted_data)
         result["qr_sensitive_data"] = cipher_payload
         await collection_orders.insert_one(result)
-        logger.info("✅ Order successfully stored in MongoDB.")
         return {
             "total_amount": result["total_amount"],
             "delivery_date": result["delivery_date"],
@@ -94,7 +91,6 @@ async def set_order(request: Request, data: OrderRequest):
 
 @order_router.get("/getOrderQR")
 async def get_order_qr(request: Request):
-    logger.info("🟢 User initiated get order QR request...")
     order_id = request.query_params.get("order_id")
     payload = get_current_user(request)
     user_type = payload.get("userType")
@@ -102,7 +98,6 @@ async def get_order_qr(request: Request):
     if not order_id: raise HTTPException(status_code=400, detail="Missing order_id parameter")
     try:
         decoded_order_id = unquote(order_id)
-        logger.info(f"🔓 Decoded order ID: {decoded_order_id}")
         data = await collection_orders.find_one({"order_id": decoded_order_id}, {"qr_sensitive_data": 0, "_id": 0})
         if not data: raise HTTPException(status_code=404, detail="Order not found")
         if user_type == "users":

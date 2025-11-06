@@ -1,72 +1,57 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./../CSS/checkout.css";
+import { ProductCard } from "../Cards";
 import axios from "axios";
 import { Header, Footer } from "../header_footer";
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
-const getSavedCart = () => {
-  try { return JSON.parse(localStorage.getItem("cart")) || [];}
-  catch { return []; }
-}; const saveCart = (cart) => localStorage.setItem("cart", JSON.stringify(cart));
-
-const ProductCards = ({ cart, editable = false, onQuantityChange }) => {
-  console.log(cart)
-  if (cart.length === 0) return <p>Your cart is empty.</p>;
-  return cart.map(({ product, quantity }) => (
-    <div key={product.id} className="product-card">
-      <img src={typeof product.image === 'string'? product.image: product.image instanceof File? URL.createObjectURL(product.image[0]): '/placeholder.jpg' } alt={product.name} style={{ objectFit: 'cover' }}/>
-      <h3>{product.name}</h3>
-      {editable ? (
-        <><p>Price: ₹{product.price}</p>
-          <div className="quantity-container">
-            <button className="quantity-button" onClick={() => onQuantityChange(product.id, "decrease")} > – </button>
-            <span className="quantity-display">{quantity}</span>
-            <button className="quantity-button" onClick={() => onQuantityChange(product.id, "increase")} > + </button>
-          </div> </>
-      ) : (
-        <> <p>Quantity: {quantity}</p>
-          <p>Total Price: ₹{(product.price * quantity).toFixed(2)}</p> </>
-      )}
-    </div>
-  ));
+const ProductCards = ({ cart, editable = false, setCart }) => {
+  if (!cart || cart.length === 0) return <p>Your cart is empty.</p>;
+  return (
+    <>
+      {cart.map(({ id, name, price, image, orderQty, orderSize, orderColor }, index)=>(
+        <ProductCard key={`${id}-${orderSize}-${orderColor}-${index}`} product={{ id: id, name, price, image, orderQty, orderSize, orderColor }} user_type="users" order={true} editable={editable} setCart={setCart}/>
+      ))}
+    </>
+  );
 };
 
 const CartCheckout = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cart, setCart] = useState([]);
   const [step, setStep] = useState("cart");
-  const [cart, setCart] = useState(getSavedCart);
   const [searchInput, setSearchInput] = useState("");
-	const [billing, setBilling] = useState({
-		name: localStorage.getItem("username") || "",
-		email: localStorage.getItem("user_email") || "",
-		phone: localStorage.getItem("phone") || "",
-		address: "",
-		special_instructions: "",
-		agent_notes: ""
-	});
+	const [billing, setBilling] = useState({name: localStorage.getItem("username") || "", email: "", phone: "", address: "", special_instructions: "", agent_notes: ""});
 	const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    saveCart(cart);
-  }, [cart]);
-
-  useEffect(() => {
+    const getCart = () => {
+      try {
+        const storedCart = JSON.parse(localStorage.getItem("cart"));
+        return Array.isArray(storedCart) ? storedCart : [];
+      } catch {return [];}
+    }; const stored = getCart();
+    setCart(stored);
     const params = new URLSearchParams(location.search);
     const urlStep = params.get("step");
-    if (urlStep === "checkout") {
-      setStep("checkout");
-    }
+    if (urlStep === "checkout") setStep("checkout");
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/userData`, {
+          withCredentials: true,
+        }); const userData = response.data.data;
+        setBilling((prev) => ({...prev,name: userData.username || "", email: userData.email || "", phone: userData.phone || ""}));
+      } catch (error) { console.error("❌ Error fetching user data:", error);}
+    }; fetchUserData();
+    setLoading(false);
   }, [location.search]);
 
-  const filteredCart = cart.filter(({ product }) => product.name.toLowerCase().includes(searchInput.toLowerCase ()));
-  const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity,0);
+  const filteredCart = searchInput.trim() === ''? cart : cart.filter(({ name }) => name?.toLowerCase().includes(searchInput.toLowerCase()));
 
-  const updateQuantity = useCallback((id, action) => {
-    setCart((prev) =>
-      prev.map((item) => item.product.id === id? { ...item, quantity: action === "increase" ? item.quantity + 1 : item.quantity - 1, } : item ).filter((i) => i.quantity > 0)
-    );}, []);
-
+  const total = cart.reduce((sum, item) => sum + item.price * item.orderQty, 0);
+  
   const handleField = (field) => (e) => {setBilling({ ...billing, [field]: e.target.value });};
 	
   const placeOrder = async (e) => {
@@ -94,48 +79,65 @@ const CartCheckout = () => {
     }
   };
 
+  if (loading) return (<>
+    <div className="toast-overlay" />
+    <div className="toast-message processing">Loading the Data...</div>
+  </>); if (error) return (<>
+    <div className="toast-overlay" onClick={() => { setError(null); }} />
+    <div className="toast-message error" onClick={() => { setError(null); }}>{error}</div>
+  </>);
+
   return (
     <><Header />
       {step === "cart" && (
-        <section id="cart" className="section">
-          <h1>Your Cart</h1>
-          <div className="search-bar">
-            <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..."/>
-            <button className="anchor" disabled={cart.length === 0 || localStorage.getItem("userType") === "agent"? true: false} onClick={() => setStep("checkout")}> Checkout</button>
+        <section className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "10px 20px"}}>
+          <h1 className="font-bold text-2xl" style={{fontFamily: "Merriweather, Cambria, serif", margin: "10px"}}>Your Cart</h1>
+          <div className="flex items-center justify-center gap-2.5 bg-[#f2f2f2] rounded-lg" style={{margin: "10px 0", padding: "10px"}}>
+            <input className="w-[250px] text-[1rem] border-[#ddd] border-2 rounded-[5px]" style={{padding: "10px"}} type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..." />
+
+            <button className={`bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] ${cart.length === 0 ? "bg-[#ccc] text-[#666] cursor-not-allowed opacity-60 pointer-events-none" : ""}`} disabled={cart.length === 0 || localStorage.getItem("userType") === "agent"? true: false} onClick={() => setStep("checkout")} style={{padding: "10px 15px"}}> Checkout</button>
           </div>
-          <div id="cart-list" className="product-container"><ProductCards cart={filteredCart} editable onQuantityChange={updateQuantity} /></div>
+          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={cart} editable setCart={setCart}/></div>
         </section>
       )}
 
       {step === "checkout" && (
-        <section id="checkout" className="section">
-          <h1>Checkout</h1>
-          <div className="product-container"><ProductCards cart={cart} /></div>
+        <section className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "10px 20px"}}>
+          <h1 className="font-bold text-2xl" style={{fontFamily: "Merriweather, Cambria, serif", margin: "10px"}}>Checkout</h1>
+          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={filteredCart} /></div>
 
 					{cart.length > 0 && (
-						<div className="cart-summary">
-							<div id="item-total" className="cart-total"><span className="tag">Total Items</span><span className="price">{cart.length}</span></div>
-							<div id="cart-totaler" className="cart-total"><span className="tag">Cart Total</span><span className="price">₹ {total.toFixed(2)}</span></div>
-							<div id="delivery-total" className="cart-total"><span className="tag">Delivery Charges</span><span className="price">₹ 40</span></div>
-							<br></br><hr></hr>
-							<div id="order-total" className="cart-total"><span className="tag">Order Total</span><span className="price">₹ {(total + 40).toFixed(2)}</span></div>
+						<div className="w-[70vw] max-w-none border border-[#ccc] rounded-2xl bg-[#f9f9f9] hover:cursor-not-allowed" style={{margin: "10px auto 70px auto", padding: "30px 40px"}}>
+							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span>Total Items</span><span>{cart.length}</span></div>
+							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span>Cart Total</span><span>₹ {total.toFixed(2)}</span></div>
+							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span>Delivery Charges</span><span className="price">₹ 40</span></div>
+							<hr />
+							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span className="font-bold">Order Total</span><span className="price">₹ {(total + 40).toFixed(2)}</span></div>
 						</div>
 					)}
 
-          <div className="checkout-section">
-            <h2>Billing and Payments</h2>
-            <form className="checkout-form" onSubmit={placeOrder}>
-              <div className="billing-info">
-                <input type="text" value={billing.name} onChange={handleField("name")} required />
-                <input type="email" value={billing.email} onChange={handleField("email")} required />
-                <input type="tel" value={billing.phone} onChange={handleField("phone")} required />
-                <textarea placeholder="Shipping Address" value={billing.address} onChange={handleField("address")} required/>
-								<textarea placeholder="Special Instructions" value={billing.special_instructions} onChange={handleField("special_instructions")} />
-								<textarea placeholder="Agent Notes" value={billing.agent_notes} onChange={handleField("agent_notes")} />
+          <div className="bg-[#f9f9f9] w-[90%] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)]" style={{fontFamily: "'Segoe UI', sans-serif", margin: "20px auto", padding: "24px"}}>
+            <h1 className="text-3xl text-[#28a745] mb-2" style={{fontFamily: "Montserrat, Poppins, sans-serif", margin: "5px 0px 20px 0px"}}>Billing and Payments</h1>
+            <form className="flex flex-col gap-3 w-full items-center" style={{padding: "0 30px"}} onSubmit={placeOrder}>
+              <div className="flex justify-between gap-5 w-full">
+                <input className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="text" value={billing.name} onChange={handleField("name")} required />
+
+                <input className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="email" value={billing.email} onChange={handleField("email")} required />
+
+                <input className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="tel" value={billing.phone} onChange={handleField("phone")} required />
               </div>
-              <div className="checkout-buttons">
-                <button type="button" onClick={() => setStep("cart")}> Back to Cart</button>
-                <button id="confirm-order" type="submit" disabled={cart.length === 0}>Place Order</button>
+
+              <textarea className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Shipping Address" value={billing.address} onChange={handleField("address")} required/>
+
+              <div className="flex justify-between gap-5 w-full h-[100px]">
+                <textarea className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Special Instructions, LandMarks" value={billing.special_instructions} onChange={handleField("special_instructions")} />
+
+                <textarea className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Agent Notes" value={billing.agent_notes} onChange={handleField("agent_notes")} />
+              </div>
+
+              <div className="flex justify-center gap-5" style={{marginTop: "10px"}}>
+                <button className="text-[1rem] text-white font-bold border-0 rounded-lg cursor-pointer bg-[#28a745] transition duation-300 focus:border-[#28a745] focus:outline-none hover:bg-[#218838] disabled:bg-[#ccc] disabled:text-[#666] disabled:cursor-not-allowed disabled:opacity-[0.6]transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)" style={{fontFamily: "'Segoe UI', sans-serif", padding: "10px 20px"}} type="button" onClick={() => setStep("cart")}> Back to Cart</button>
+                <button className="text-[1rem] text-white font-bold border-0 rounded-lg cursor-pointer bg-[#28a745] transition duation-300 focus:border-[#28a745] focus:outline-none hover:bg-[#218838] disabled:bg-[#ccc] disabled:text-[#666] disabled:cursor-not-allowed disabled:opacity-[0.6]transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)" style={{fontFamily: "'Segoe UI', sans-serif", padding: "10px 20px"}} type="submit" disabled={cart.length === 0}>Place Order</button>
               </div>
             </form>
           </div>

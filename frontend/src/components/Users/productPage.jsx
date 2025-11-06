@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
-import './../CSS/product.css';
 import { Header, Footer } from "./../header_footer";
+import { ProductCard } from '../Cards';
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const ProductsPage = () => {
@@ -52,37 +52,13 @@ const ProductsPage = () => {
     setCurrentPage(1);
   }, [searchInput, selectedCategory, products]);
 
-  const handleAddToCart = (productId) => {
-    const product = products.find(p => p.id === Number(productId));
-    if (!product) return;
-    const { _id, description, variants, tags, ...cleanProduct } = product;
-    const existing = cart.find(item => item.product.id === productId);
-    let updatedCart;
-    if (existing) {
-      updatedCart = cart.map(item => item.product.id === productId ? { ...item, quantity: item.quantity + 1 } : item);
-    } else {updatedCart = [...cart, { product: cleanProduct, quantity: 1 }];
-    }setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-  };
-
-  const handleUpdateQuantity = (productId, action) => {
-    let updatedCart = cart.map(item => {
-      if (item.product.id === productId) {
-        const newQuantity = action === 'increase' ? item.quantity + 1 : item.quantity - 1;
-        return { ...item, quantity: newQuantity };
-      }return item;
-    }).filter(item => item.quantity > 0);
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-  };
-
   const paginatedProducts = useMemo(() =>
     filteredProducts.slice((currentPage - 1) * productsPerLoad, currentPage * productsPerLoad),
     [filteredProducts, currentPage]
-  );  
+  ); 
 
   return (
-    <div>
+    <>
     {loading && (<>
       <div className="toast-overlay" />
       <div className="toast-message processing">Loading the Data...</div>
@@ -91,51 +67,36 @@ const ProductsPage = () => {
       <div className="toast-message error" onClick={() => { setError(null); }}>{error}</div>
     </>)}
      <Header />
-     <div className="search-bar">
-        <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..." />
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+
+     <div className="flex items-center justify-center gap-2.5 bg-[#f2f2f2] rounded-lg" style={{margin: "20px 0", padding: "10px"}}>
+        <input className="w-[250px] text-[1rem] border-[#ddd] border-2 rounded-[5px]" style={{padding: "10px"}} type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..." />
+        <select className="w-[150px] text-[1rem] border-2 border-[#ddd] rounded-[5px]" style={{padding: "10px"}} value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
           {categories.map((cat, idx) => <option key={idx} value={cat}>{cat}</option>)}
         </select>
-        <a className="anchor" href="/CartCheckout">View Cart</a>
-        <a className={`anchor ${cart.length === 0 ? "disabled" : ""}`} href={cart.length === 0 ? "#" : `/CartCheckout?step=${encodeURIComponent("checkout")}`} onClick={(e) => { if (cart.length === 0) e.preventDefault();}}> Checkout </a>
+        <a className="bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049]" style={{padding: "10px 15px"}} href="/CartCheckout">View Cart</a>
+        <a className={`bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] ${cart.length === 0 ? "bg-[#ccc] text-[#666] cursor-not-allowed opacity-60 pointer-events-none" : ""}`} href={cart.length === 0 ? "#" : `/CartCheckout?step=${encodeURIComponent("checkout")}`} onClick={(e) => { if (cart.length === 0) e.preventDefault();}} style={{padding: "10px 15px"}}> Checkout </a>
      </div>
 
-     <div id="products" className="section">
-        <h1>Our Products</h1>
-        <div className="product-container">
+     <div className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "10px 20px"}}>
+        <h1 className="font-bold text-2xl" style={{fontFamily: "Merriweather, Cambria, serif", margin: "10px"}}>Our Products</h1>
+        <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}>
           {paginatedProducts.map(product => {
-            const existingProduct = cart.find(item => item.product.id === product.id);
-            return (
-              <div className="product-card" key={product.id}>
-                <img src={typeof product.image === 'string'? product.image: product.image instanceof File? URL.createObjectURL(product.image[0]): '/placeholder.jpg' } alt={product.name} style={{ objectFit: 'cover' }}/>
-                <h3>{product.name}</h3>
-                <p>Price: ₹{product.price}</p>
-                {existingProduct ? (
-                  <div className="quantity-container">
-                    <button className="quantity-button" onClick={() => handleUpdateQuantity(product.id, 'decrease')}>-</button>
-                    <span className="quantity-display">{existingProduct.quantity}</span>
-                    <button className="quantity-button" onClick={() => handleUpdateQuantity(product.id, 'increase')}>+</button>
-                  </div>
-                ) : (
-                  <button onClick={() => handleAddToCart(product.id)}>Add to Cart</button>
-                )}
-              </div>
-            );
+            return ( <ProductCard product={product} key={product.id} /> );
           })}
         </div>
 
-        <div className="pagination-container">
+        <div>
           {currentPage > 1 && (
-            <button className="page-button current-page" onClick={() => setCurrentPage(currentPage - 1)}>&#10094;</button>
+            <button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] transition-colors duration-300 decoration-0" style={{padding: "8px 12px", margin: "5px"}} onClick={() => setCurrentPage(currentPage - 1)}>&#10094;</button>
           )}
-          <button className="page-button">{currentPage}</button>
+          <button className="bg-[#3cbf4e] text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049]" style={{padding: "10px 15px"}}>{currentPage}</button>
           {currentPage * productsPerLoad < filteredProducts.length && (
-            <button className="page-button current-page" onClick={() => setCurrentPage(currentPage + 1)}>&#10095;</button>
+            <button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] transition-colors duration-300 decoration-0" style={{padding: "8px 12px", margin: "5px"}} onClick={() => setCurrentPage(currentPage + 1)}>&#10095;</button>
           )}
         </div>
       </div>
       <Footer />
-    </div>
+    </>
   );
 };
 

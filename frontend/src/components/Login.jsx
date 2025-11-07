@@ -35,7 +35,10 @@ const LoginRegister = () => {
    useEffect(() => {
     const verifyToken = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/verify-token`, {
+        let res = await axios.get(`${BASE_URL}`, {
+          withCredentials: true,
+        }); 
+        res = await axios.get(`${BASE_URL}/api/verify-token`, {
           withCredentials: true,
         }); if (res.data.valid) {
           console.log("✅ Auto-login success:", res.data);

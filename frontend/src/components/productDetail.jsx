@@ -45,8 +45,8 @@ const ProductDetail = () => {
           withCredentials: true,
         }); setProduct(response.data);
         if (orderSize && orderSize) {
-          const variant = response.data.variants.find(v => v.size === orderSize);
-          console.log(variant);
+          const variants = Array.isArray(response.data.variants) ? response.data.variants : [];
+          const variant = variants.find(v => v.size === orderSize);
           if (variant && variant.options[orderColor] !== undefined){
             maxQuantity.current = variant.options[orderColor];
           } else maxQuantity.current = 0;
@@ -56,6 +56,7 @@ const ProductDetail = () => {
   }, [limit, product_id]);
 
   const handleAddToCart = (change = null) => {
+    if (!product) { console.warn("Product not loaded yet"); return; }
     const safeCart = Array.isArray(cart) ? cart : [];
     const existing = safeCart.find((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize);
     let updatedCart;
@@ -66,7 +67,7 @@ const ProductDetail = () => {
         updatedCart = safeCart.map((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize ? { ...item, orderQty: item.orderQty - 1 } : item) .filter((item) => item.orderQty > 0);
       }
     } else {
-      updatedCart = [...safeCart, { id: Number(product_id) , name: product.name, price: product.price, image: product.images[0], orderSize: selectedSize, orderColor: selectedColor, orderQty: 1, maxQty: maxQuantity.current } ];
+      updatedCart = [...safeCart, { id: Number(product_id) , name: product.name, price: product.price, image: product?.images?.[0] || "", orderSize: selectedSize, orderColor: selectedColor, orderQty: 1, maxQty: maxQuantity.current } ];
     } setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
@@ -86,8 +87,10 @@ const ProductDetail = () => {
 
       <div className="bg-transparent flex flex-col items-center justify-center gap-6 lg:sticky lg:top-0 lg:h-screen lg:w-[40%] w-full h-auto p-4" style={{margin:"0px 10px 10px 20px"}}>
 
-        <img src={product.images[selectedImage]} onClick={() => setZoomed(true)} alt={product.name} className="w-full h-[70%] object-cover rounded-md transition-all duration-300 cursor-zoom-in hover:scale-102"/>
-        
+        {product?.images?.length > 0 && (
+          <img src={product.images[selectedImage]} onClick={() => setZoomed(true)} alt={product.name || "Product image"} className="w-full h-[70%] object-cover rounded-md transition-all duration-300 cursor-zoom-in hover:scale-102" />
+        )}
+
         <div className="flex gap-4">
           {product.images?.map((image, index) => (
             <button key={index} onClick={() => setSelectedImage(index)} className={`w-24 h-28 rounded-lg overflow-hidden border-2 transition-all ${ selectedImage === index ? 'border-blue-500' : 'border-gray-200' }`}>
@@ -133,7 +136,7 @@ const ProductDetail = () => {
           <h3 className="text-xl font-semibold" style={{ fontFamily: "Montserrat, Poppins, sans-serif", marginBottom: "10px" }}> Colors</h3>
           {selectedSize ? (
             <div className="flex gap-3 flex-wrap">
-              {Object.entries(product.variants.find((variant) => variant.size === selectedSize)?.options || {}).map(([color, qty]) => (
+              {Object.entries(product?.variants?.find((variant) => variant.size === selectedSize)?.options || {}).map(([color, qty]) => (
                 <button key={color} onClick={() => {setSelectedColor(color); maxQuantity.current = qty;}} className={`w-auto h-10 rounded-[10px] border-2 text-sm font-medium transition-all ${selectedColor === color ? "border-gray-900 bg-gray-900 text-white" : "border-gray-300 hover:border-gray-400 hover:bg-gray-200"}`} style={{fontFamily: "Montserrat, Poppins, sans-serif", paddingLeft:"10px", paddingRight:"10px"}}> {color}</button>
               ))}
             </div>

@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import LoginRegister from './components/Login.jsx';
 import SellerHome from './components/Sellers/SellerHome.jsx';
 import Home from './components/Users/Home.jsx';
-import ProductsPage from './components/Users/productPage.jsx';
+import ProductsPage from './components/Users/Product.jsx';
 import CartCheckout from './components/Users/cart.jsx'
 import ThankYou from './components/Users/thankyou.jsx';
 import CusAgentOrder from './components/cus_agent_order.jsx';
@@ -13,8 +13,8 @@ import ProductDetail from './components/productDetail.jsx'
 function App() {  
   return (
     <Routes>
-      <Route path="/Home" element={<Home />} />
       <Route path="/" element={<LoginRegister />} />
+      <Route path="/Home" element={<Home />} />
       <Route path="/Products" element={<ProductsPage />} />
       <Route path="/Products/:product_id/:user_type" element={<ProductDetail />} />
       <Route path="/CartCheckout" element={<CartCheckout />} />

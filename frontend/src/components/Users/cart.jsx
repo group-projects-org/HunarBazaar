@@ -5,6 +5,14 @@ import axios from "axios";
 import { Header, Footer } from "../header_footer";
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
+const safeParse = (key) => {
+  try {
+    const value = localStorage.getItem(key);
+    if (!value || value === "undefined" || value === "null") return [];
+    return JSON.parse(value);
+  } catch { return []; }
+};
+
 const ProductCards = ({ cart, editable = false, setCart }) => {
   if (!cart || cart.length === 0) return <p>Your cart is empty.</p>;
   return (
@@ -29,7 +37,7 @@ const CartCheckout = () => {
   useEffect(() => {
     const getCart = () => {
       try {
-        const storedCart = JSON.parse(localStorage.getItem("cart"));
+        const storedCart = safeParse('cart');;
         return Array.isArray(storedCart) ? storedCart : [];
       } catch {return [];}
     }; const stored = getCart();

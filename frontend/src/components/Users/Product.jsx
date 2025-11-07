@@ -4,6 +4,14 @@ import { Header, Footer } from "./../header_footer";
 import { ProductCard } from '../Cards';
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
+const safeParse = (key) => {
+  try {
+    const value = localStorage.getItem(key);
+    if (!value || value === "undefined" || value === "null") return [];
+    return JSON.parse(value);
+  } catch { return []; }
+};
+
 const ProductsPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -17,7 +25,7 @@ const ProductsPage = () => {
   const productsPerLoad = 60;
 
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    const storedCart = safeParse('cart');
     setCart(storedCart);
     const fetchProducts = async () => {
       try {

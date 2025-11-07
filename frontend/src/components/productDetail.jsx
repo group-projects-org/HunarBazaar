@@ -5,6 +5,14 @@ import axios from 'axios';
 import {Header, Footer} from './header_footer';
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
+const safeParse = (key) => {
+  try {
+    const value = localStorage.getItem(key);
+    if (!value || value === "undefined" || value === "null") return [];
+    return JSON.parse(value);
+  } catch { return []; }
+};
+
 const ProductDetail = () => {
   const { product_id, user_type } = useParams();
   const [loading, setLoading] = useState(true);
@@ -15,7 +23,7 @@ const ProductDetail = () => {
   const [zoomed, setZoomed] = useState(false);
   const [cart, setCart] = useState(() => {
     try {
-      const storedCart = JSON.parse(localStorage.getItem("cart"));
+      const storedCart = safeParse('cart');;
       return Array.isArray(storedCart) ? storedCart : [];
     } catch { return [];}
   });

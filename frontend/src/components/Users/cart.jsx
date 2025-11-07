@@ -97,14 +97,14 @@ const CartCheckout = () => {
 
             <button className={`bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] ${cart.length === 0 ? "bg-[#ccc] text-[#666] cursor-not-allowed opacity-60 pointer-events-none" : ""}`} disabled={cart.length === 0 || localStorage.getItem("userType") === "agent"? true: false} onClick={() => setStep("checkout")} style={{padding: "10px 15px"}}> Checkout</button>
           </div>
-          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={cart} editable setCart={setCart}/></div>
+          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={filteredCart} editable={true} setCart={setCart}/></div>
         </section>
       )}
 
       {step === "checkout" && (
         <section className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "10px 20px"}}>
           <h1 className="font-bold text-2xl" style={{fontFamily: "Merriweather, Cambria, serif", margin: "10px"}}>Checkout</h1>
-          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={filteredCart} /></div>
+          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={cart} editable={false} setCart={setCart}/></div>
 
 					{cart.length > 0 && (
 						<div className="w-[70vw] max-w-none border border-[#ccc] rounded-2xl bg-[#f9f9f9] hover:cursor-not-allowed" style={{margin: "10px auto 70px auto", padding: "30px 40px"}}>

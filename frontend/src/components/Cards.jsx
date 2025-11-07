@@ -19,7 +19,7 @@ const ProductCard = ({ product, user_type = "users", order = false, editable = f
   const navigate = useNavigate();
   const updateQuantity = useCallback((id, action) => {
     setCart((prev) => {
-    const updatedCart = prev.map((item) => item.product.id === id ? {...item, orderQty: action === "inc"? item.orderQty + 1 : item.orderQty - 1,} : item ).filter((i) => i.orderQty > 0);
+    const updatedCart = prev.map((item) => item.id === id ? {...item, orderQty: action === "inc"? item.orderQty + 1 : item.orderQty - 1,} : item ).filter((i) => i.orderQty > 0);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     return updatedCart;
   });},[setCart]);

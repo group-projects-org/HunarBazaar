@@ -28,8 +28,8 @@ app.include_router(seller_product_router, prefix="/api", tags=["Seller Product D
 
 app.add_middleware(CORSMiddleware, allow_origins=[BASE_URI], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
-@app.get("/api")
-async def root():
+@app.get("/")
+async def rootBackend():
     return {
         "message": "HunarBazar Backend API",
         "version": "1.0.0",
@@ -38,6 +38,14 @@ async def root():
             "prefix": '/api',
             "orders": ['/order', '/getOrderData', '/getOrder', '/getOrderQR'],
         }
+    }
+
+@app.get("/api")
+async def rootFrontend():
+    return {
+        "message": "HunarBazar Backend API",
+        "version": "1.0.0",
+        "status": "running"
     }
 
 if __name__ == "__main__":

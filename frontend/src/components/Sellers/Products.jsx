@@ -98,44 +98,68 @@ const ProductsListed = () => {
 
   // ✅ Handle new product save
   const handleSaveProduct = async (e) => {
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append('name', newProduct.name);
-      formData.append('price', newProduct.price);
-      formData.append('category', newProduct.category);
-      formData.append('description', newProduct.description);
-      formData.append('variants', JSON.stringify(newProduct.variants));
-      formData.append('image_links', JSON.stringify(newProduct.image_links))
+  e.preventDefault();
 
-      if (newProduct.images && newProduct.images.length > 0) {
-        newProduct.images.forEach(file => formData.append('images', file));
-      }
+  try {
+    const formData = new FormData();
 
-      const response = await axios.post(`${BASE_URL}/api/add_product`, formData, {
-        withCredentials: true
+    // 🔹 Basic fields
+    formData.append('name', newProduct.name.trim());
+    formData.append('price', newProduct.price);
+    formData.append('category', newProduct.category);
+    formData.append('description', newProduct.description);
+
+    // 🔹 Variants as JSON
+    formData.append('variants', JSON.stringify(newProduct.variants));
+
+    // 🔹 Append multiple image URLs individually (array of URLs)
+    if (newProduct.image_links && newProduct.image_links.length > 0) {
+      newProduct.image_links.forEach((url) => {
+        if (url && url.trim() !== "") {
+          formData.append('image_links[]', url.trim());
+        }
       });
-
-      if (response.status === 200 || response.status === 201) {
-        alert('✅ Product saved successfully!');
-        setShowModal(false);
-        setNewProduct({
-          name: '',
-          price: '',
-          category: '',
-          description: '',
-          variants: [],
-          images: [],
-          image_links: []
-        });
-      } else {
-        alert('❌ Failed to save product. Try again.');
-      }
-    } catch (err) {
-      console.error('Error saving product:', err);
-      alert('⚠️ Error while saving product');
     }
-  };
+
+    // 🔹 Append uploaded image files
+    if (newProduct.images && newProduct.images.length > 0) {
+      newProduct.images.forEach((file) => {
+        formData.append('images', file);
+      });
+    }
+
+    // ✅ API call
+    const response = await axios.post(`${BASE_URL}/api/add_product`, formData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    // ✅ Handle response
+    if (response.status === 200 || response.status === 201) {
+      alert('✅ Product saved successfully!');
+      setShowModal(false);
+
+      // Reset product form cleanly
+      setNewProduct({
+        name: '',
+        price: '',
+        category: '',
+        description: '',
+        variants: [],
+        images: [],
+        image_links: [],
+      });
+    } else {
+      alert('❌ Failed to save product. Try again.');
+    }
+  } catch (err) {
+    console.error('Error saving product:', err);
+    alert('⚠️ Error while saving product');
+  }
+};
+
 
   // ✅ Handle size toggle inside modal
   const handleSizeToggle = (size) => {

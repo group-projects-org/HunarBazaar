@@ -58,7 +58,6 @@ const ProductDetail = () => {
         updatedCart = safeCart.map((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize ? { ...item, orderQty: item.orderQty - 1 } : item) .filter((item) => item.orderQty > 0);
       }
     } else {
-      if (change == "inc") return;
       updatedCart = [...safeCart, { id: Number(product_id) , name: product.name, price: product.price, image: product.images[0], orderSize: selectedSize, orderColor: selectedColor, orderQty: 1, maxQty: maxQuantity.current } ];
     } setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
@@ -145,7 +144,7 @@ const ProductDetail = () => {
 
                   <span className="text-[16px] font-bold text-center max-w-10"> {existingProduct.orderQty}</span>
 
-                  <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 disabled:bg-[#f7f0f0] disabled:cursor-not-allowed disabled:text-black disabled:border disabled:border-[#d4d0d0] hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => handleAddToCart("inc")} disabled={existingProduct.orderQty >= maxQuantity.current}> <Plus /> </button>
+                  <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 disabled:bg-[#f7f0f0] disabled:cursor-not-allowed disabled:text-black disabled:border disabled:border-[#d4d0d0] hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => handleAddToCart()} disabled={existingProduct.orderQty >= maxQuantity.current}> <Plus /> </button>
                   
                 </div>
                 {existingProduct.orderQty >= maxQuantity.current && (<p style={{ color: "red", fontSize: "12px", marginTop: "10px" }}>❌ Max Ordering Quantity reached</p>)} 

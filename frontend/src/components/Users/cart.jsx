@@ -17,8 +17,8 @@ const ProductCards = ({ cart, editable = false, setCart }) => {
   if (!cart || cart.length === 0) return <p>Your cart is empty.</p>;
   return (
     <>
-      {cart.map(({ id, name, price, image, orderQty, orderSize, orderColor }, index)=>(
-        <ProductCard key={`${id}-${orderSize}-${orderColor}-${index}`} product={{ id: id, name, price, image, orderQty, orderSize, orderColor }} user_type="users" order={true} editable={editable} setCart={setCart}/>
+      {cart.map(({ id, name, price, image, orderQty, orderSize, orderColor, maxQty }, index)=>(
+        <ProductCard key={`${id}-${orderSize}-${orderColor}-${index}`} product={{ id: id, name, price, image, orderQty, orderSize, orderColor, maxQty }} user_type="users" order={true} editable={editable} setCart={setCart}/>
       ))}
     </>
   );

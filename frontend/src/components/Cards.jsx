@@ -17,9 +17,9 @@ const CategoryCard = ({ category }) => {
 
 const ProductCard = ({ product, user_type = "users", order = false, editable = false, setCart = null,}) => {
   const navigate = useNavigate();
-  const updateQuantity = useCallback((id, action) => {
+  const updateQuantity = useCallback((id, selectedColor, selectedSize, action) => {
     setCart((prev) => {
-    const updatedCart = prev.map((item) => item.id === id ? {...item, orderQty: action === "inc"? item.orderQty + 1 : item.orderQty - 1,} : item ).filter((i) => i.orderQty > 0);
+    const updatedCart = prev.map((item) => item.id === id && item.orderColor === selectedColor && item.orderSize === selectedSize? {...item, orderQty: action === "inc"? item.orderQty + 1 : item.orderQty - 1,} : item ).filter((i) => i.orderQty > 0);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     return updatedCart;
   });},[setCart]);
@@ -48,11 +48,11 @@ const ProductCard = ({ product, user_type = "users", order = false, editable = f
           {editable ? (
             <div className='flex-1 flex-column justify-center items-center text-center' style={{padding: "0", margin: "0"}}>
               <div className="flex items-center justify-center gap-[15px] w-full">
-                <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => updateQuantity(product.id, "dec")} disabled={product.orderQty == 0}> <Minus /> </button>
+                <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => updateQuantity(product.id, product.orderColor, product.orderSize, "dec")} disabled={product.orderQty == 0}> <Minus /> </button>
 
                 <span className="text-[16px] font-bold text-center max-w-10"> {product.orderQty}</span>
 
-                <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 disabled:bg-[#f7f0f0] disabled:cursor-not-allowed disabled:text-black disabled:border disabled:border-[#d4d0d0] hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => updateQuantity(product.id, "inc")} disabled={product.orderQty >= product.maxQty}> <Plus /> </button>
+                <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 disabled:bg-[#f7f0f0] disabled:cursor-not-allowed disabled:text-black disabled:border disabled:border-[#d4d0d0] hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => updateQuantity(product.id, product.orderColor, product.orderSize, "inc")} disabled={product.orderQty >= product.maxQty}> <Plus /> </button>
                 
               </div>
               {product.orderQty >= product.maxQuantity && (<p style={{ color: "red", fontSize: "12px", marginTop: "10px" }}>❌ Max Ordering Quantity reached</p>)} 

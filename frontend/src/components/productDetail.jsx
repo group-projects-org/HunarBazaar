@@ -46,7 +46,7 @@ const ProductDetail = () => {
         }); setProduct(response.data);
         if (orderSize && orderSize) {
           const variants = Array.isArray(response.data.variants) ? response.data.variants : [];
-          const variant = variants.find(v => v.size === orderSize);
+          const variant = variants?.find(v => v.size === orderSize);
           if (variant && variant.options[orderColor] !== undefined){
             maxQuantity.current = variant.options[orderColor];
           } else maxQuantity.current = 0;
@@ -56,23 +56,22 @@ const ProductDetail = () => {
   }, [limit, product_id]);
 
   const handleAddToCart = (change = null) => {
-    if (!product) { console.warn("Product not loaded yet"); return; }
-    const safeCart = Array.isArray(cart) ? cart : [];
-    console.log(safeCart);
-    console.log(typeof(safeCart));
-    const existing = safeCart.find((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize);
-    console.log(existing, typeof(existing));
-    let updatedCart;
-    if (existing) {
-      if (change === "inc") {
-        updatedCart = safeCart.map((item) =>item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize ? { ...item, orderQty: item.orderQty + 1 } : item);
-      } else if (change === "dec") {
-        updatedCart = safeCart.map((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize ? { ...item, orderQty: item.orderQty - 1 } : item) .filter((item) => item.orderQty > 0);
-      }
-    } else {
-      updatedCart = [...safeCart, { id: Number(product_id) , name: product.name, price: product.price, image: product?.images?.[0] || "", orderSize: selectedSize, orderColor: selectedColor, orderQty: 1, maxQty: maxQuantity.current } ];
-    } setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    if (!product) return console.warn("Product not loaded yet")
+    setCart((prevCart) => {
+      const safeCart = Array.isArray(prevCart) ? prevCart : [];
+      const index = safeCart.findIndex((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize);
+      let updatedCart = [...safeCart];
+      if (index !== -1) {
+        if (change === "inc") updatedCart[index].orderQty += 1;
+        else if (change === "dec") {
+          updatedCart[index].orderQty -= 1;
+          if (updatedCart[index].orderQty <= 0) updatedCart.splice(index, 1);
+        }
+      } else {
+        updatedCart.push({id: Number(product_id), name: product.name, price: product.price, image: product?.images?.[0] || "", orderSize: selectedSize, orderColor: selectedColor, orderQty: 1, maxQty: maxQuantity.current,});
+      } localStorage.setItem("cart", JSON.stringify(updatedCart));
+      return updatedCart;
+    });
   };
 
   if (loading) return (<>
@@ -149,7 +148,7 @@ const ProductDetail = () => {
 
         <div className="flex gap-4 pt-4 justify-center" style={{margin: "10px 0px 5px 0px"}}>
           {(() => {
-            const existingProduct = cart.find((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize);
+            const existingProduct = Array.isArray(cart)? cart.find((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize) : null;
             if (user_type === "users" && existingProduct) {
               return (
               <div className='max-w-[30%] flex-1 flex-column justify-center items-center text-center' style={{padding: "0", margin: "0"}}>
@@ -158,7 +157,7 @@ const ProductDetail = () => {
 
                   <span className="text-[16px] font-bold text-center max-w-10"> {existingProduct.orderQty}</span>
 
-                  <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 disabled:bg-[#f7f0f0] disabled:cursor-not-allowed disabled:text-black disabled:border disabled:border-[#d4d0d0] hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => handleAddToCart()} disabled={existingProduct.orderQty >= maxQuantity.current}> <Plus /> </button>
+                  <button className="text-[16px] cursor-pointer bg-[#3cbf4e] text-white border-0 rounded-sm transition-colors duration-300 disabled:bg-[#f7f0f0] disabled:cursor-not-allowed disabled:text-black disabled:border disabled:border-[#d4d0d0] hover:bg-[#45a049]" style={{ padding: "5px 10px" }} onClick={() => handleAddToCart("inc")} disabled={existingProduct.orderQty >= maxQuantity.current}> <Plus /> </button>
                   
                 </div>
                 {existingProduct.orderQty >= maxQuantity.current && (<p style={{ color: "red", fontSize: "12px", marginTop: "10px" }}>❌ Max Ordering Quantity reached</p>)} 

@@ -1,5 +1,5 @@
 <h1 style="font-family: Georgia, serif;">
-  <img src="docs/Hunar_Bazaar_title.jpeg" alt="हुनरBazaar" width="40" style="vertical-align: middle; border-radius: 8px;">
+  <img src="docs/Hunar_Bazaar_title.jpeg" alt="हुनरBazaar" width="50" style="vertical-align: middle; border-radius: 8px;">
   हुनरBazaar : E-CLOTHING STORE
 </h1>
 
@@ -35,12 +35,12 @@
   <b>Tech Stack:</b> React.js, Tailwind CSS, CSS, FastAPI, C++, MongoDB <br>
   <b>Hosting:</b> Vercel, Render, MongoDB Atlas, Cloudinary <br>
   <b>API Services:</b> Twilio, SendGrid, Cloudinary
-    
 </div>
  
 <div style="font-family: Georgia, serif; font-size:16px; line-height:1.6;">
 
-## Table of Contents
+<h2 id="overview" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Table of Contents</h2>
+
 - [Overview](#overview)
 - [Features](#features)
 - [Directory Structure](#directory-structure)
@@ -52,7 +52,9 @@
 
 </div>
 
-<div id="overview" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Overview</div>
+<hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 13px 0;" />
+
+<h2 style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Overview</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
   <b>हुनरBazaar</b> is a full-stack, multilingual <b>E-Clothing marketplace</b> designed to connect Indian consumers with both <b>local artisans</b> and <b>established fashion brands</b> on a unified, luxurious digital platform.
   <br><br>
@@ -70,7 +72,7 @@
 
 <hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 13px 0;" />
 
-<div id="features" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Features</div>
+<h2 id="features" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Features</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
 <ul style="margin-top:5px; margin-bottom:10px; padding-left:18px;">
   <li><b>🛍️ Seamless Shopping Flow:</b> A beautifully crafted UI/UX that ensures effortless product discovery, browsing, and checkout across all devices.</li>
@@ -88,14 +90,14 @@
 
 <hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 13px 0;" />
 
-<div id="directory-structure" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Directory Structure</div>
+<h2 id="directory-structure" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Directory Structure</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
   For detailed information about the project's structure, please refer to the <a href="https://github.com/group-projects-org/HunarBazaar/blob/master/docs/Directory_Structure.md" target="_blank" style="color:#b8860b; text-decoration:none;"> Directory Structure</a> document.
 </div>
 
 <hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 13px 0;" />
 
-<div id="installation" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Installation</div>
+<h2 id="installation" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Installation</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
   To build and run the MerkelRex application, follow these steps:
 
@@ -144,7 +146,7 @@
 </div>
 <hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 13px 0;" />
 
-<div id="usage" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Usage</div>
+<h2 id="usage" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Usage</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
   <ul style="margin-top:5px; margin-bottom:10px; padding-left:18px;">
     <li>Start the backend service using Docker or your preferred environment:
@@ -161,7 +163,7 @@
 
 <hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 13px 0;" />
 
-<div id="contributions" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Contributions</div>
+<h2 id="contributions" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Contributions</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
   <p>Contributions are always welcome! Follow these steps to contribute to <b>हुनरBazaar</b>:</p>
   <ul style="margin-top:5px; margin-bottom:10px; padding-left:18px;">
@@ -182,8 +184,7 @@
 
 <hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 13px 0;" />
 
-<div id="license" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">License</div>
-
+<h2 id="license" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">License</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
   This project is licensed under the <b>MIT License</b>.  
   See the <a href="https://github.com/group-projects-org/HunarBazaar/blob/master/LICENSE" target="_blank" style="color:#b8860b; text-decoration:none;">LICENSE</a> file for more details.
@@ -191,7 +192,7 @@
 
 <hr style="border: none; height: 4px; background: linear-gradient(90deg, #4b2e05, #b8860b, #4b2e05); border-radius: 2px; margin: 25px 0;" />
 
-<div id="acknowledgments" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Acknowledgments</div>
+<h2 id="acknowledgments" style="font-family: Georgia, serif; font-size:27px; line-height:1.6;">Acknowledgments</h2>
 <div style="font-family: 'Trebuchet MS', sans-serif; font-size:14px; line-height:1.6; padding:12px 18px;">
   Thank you for visiting <b>हुनरBazaar</b> — a project built with passion and purpose.  
   Your feedback, suggestions, and contributions help us refine the platform and continue empowering <b>local sellers</b> and <b>Indian craftsmanship</b> through modern technology.

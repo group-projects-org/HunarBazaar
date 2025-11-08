@@ -37,6 +37,11 @@ async def rootBackend():
         "endpoints": {
             "prefix": '/api',
             "orders": ['/order', '/getOrderData', '/getOrder', '/getOrderQR'],
+            "otps" : ['/send-email-otp', '/send-sms-otp'],
+            "product": ['/product_list', '/get_categories', '/product'],
+            "seller_product": ['/add_product', '/seller_products_list'],
+            "user": ['/userData', '/subscribe'],
+            "user_state": ['/check-username', '/verify-token', '/login', '/register', '/logout'],
         }
     }
 

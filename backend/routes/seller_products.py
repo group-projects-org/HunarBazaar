@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Request, UploadFile, Form, File
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from typing import List, Optional
 from backend.config import db, logger
 from backend.JWT import get_current_user
 import cloudinary.uploader, cloudinary.api

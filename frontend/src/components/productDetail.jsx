@@ -58,7 +58,10 @@ const ProductDetail = () => {
   const handleAddToCart = (change = null) => {
     if (!product) { console.warn("Product not loaded yet"); return; }
     const safeCart = Array.isArray(cart) ? cart : [];
+    console.log(safeCart);
+    console.log(typeof(safeCart));
     const existing = safeCart.find((item) => item.id === Number(product_id) && item.orderColor === selectedColor && item.orderSize === selectedSize);
+    console.log(existing, typeof(existing));
     let updatedCart;
     if (existing) {
       if (change === "inc") {

@@ -164,7 +164,7 @@ const LoginRegister = () => {
   };
   
   return (
-    <div className='flex flex-col w-screen h-screen justify-center items-center bg-[url("assets/login_background.jpeg")] bg-cover bg-no-repeat bg-center overflow-x-hidden'>
+    <div className='flex flex-col w-screen h-screen justify-center items-center bg-[url("login_background.jpeg")] bg-cover bg-no-repeat bg-center overflow-x-hidden'>
 
       {showDevModal && (
         <div className="fixed inset-0 z-5 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-300" onClick={() => setShowDevModal(false)}>

@@ -19,53 +19,19 @@ const LoginRegister = () => {
      const [showDevModal, setShowDevModal] = useState(false);
      const navigate = useNavigate();
 
-  useEffect(() => {
-     document.body.style.backgroundImage = "url('assets/login_background.jpeg')";
-     document.body.style.backgroundSize = "cover";
-     document.body.style.backgroundRepeat = "no-repeat";
-     document.body.style.backgroundPosition = "center";
-     return () => {
-       document.body.style.backgroundImage = "";
-       document.body.style.backgroundSize = "";
-       document.body.style.backgroundRepeat = "";
-       document.body.style.backgroundPosition = "";
-     };
-   }, []);
-
    useEffect(() => {
     const verifyToken = async () => {
       try {
-        let res = await axios.get(`${BASE_URL}`, {
-          withCredentials: true,
-        }); 
-        res = await axios.get(`${BASE_URL}/api/verify-token`, {
-          withCredentials: true,
+        let res = await axios.get(`${BASE_URL}`, {withCredentials: true,}); 
+        res = await axios.get(`${BASE_URL}/api/verify-token`, { withCredentials: true,
         }); if (res.data.valid) {
           console.log("✅ Auto-login success:", res.data);
           localStorage.setItem("username", res.data.username);
           navigate(res.data.userType === "sellers" ? "/seller/Home" : res.data.userType === "agents" ? "/agent/" : "/Home");
         }
-      } catch (err) {
-        console.log("❌ No active session:", err.response?.data?.message || err.message);
-      }
+      } catch (err) { console.log("❌ No active session:", err.response?.data?.message || err.message); }
     }; verifyToken();
   }, [navigate]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api`, { signal });
-        console.log("Login auto-triggered:", res.data);
-      } catch (err) {
-        if (axios.isCancel(err)) console.log("❌ Request cancelled (component unmounted).");
-        else console.error("Error fetching API:", err);
-    }}; fetchData();
-    return () => {
-      controller.abort();
-      console.log("🧹 Cleanup: API request aborted.");
-  };}, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => { if (e.key === "Escape") setShowDevModal(false); };
@@ -73,8 +39,9 @@ const LoginRegister = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const handleRegisterClick = () => {setIsActive(true);};
-  const handleLoginClick = () => {setIsActive(false);};
+  const handleRegisterClick = () => { setIsActive(true); }; 
+  const handleLoginClick = () => { setIsActive(false); };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -84,6 +51,7 @@ const LoginRegister = () => {
       setTypingTimeout(timeout);
     }
   };
+
   const checkUsername = async (username, userType) => {
     try {
       const res = await axios.post(`${BASE_URL}/api/check-username`, {username, userType,});
@@ -95,13 +63,10 @@ const LoginRegister = () => {
     e.preventDefault();
     setIsLoggingIn(true);
     try {
-      const response = await axios.post(`${BASE_URL}/api/login`, formData, {
+      const { data } = await axios.post(`${BASE_URL}/api/login`, formData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
-      });
-      const data = response.data;
-      console.log("Login successful:", data);
-      localStorage.setItem("username", data.username);
+      }); localStorage.setItem("username", data.username);
       localStorage.setItem("cart", data.cart);
       navigate(formData.userType !== "sellers" ? "/Home" : "/seller/Home");
     } catch (error) {
@@ -119,7 +84,6 @@ const LoginRegister = () => {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       }); const data = await response.json();
-  
       if (response.status === 409) {
         alert(data.error || 'User already exists.');
       } else if (response.ok) {
@@ -158,7 +122,7 @@ const LoginRegister = () => {
   const HandlePhoneVerify = async () => {
      try {
        setIsPhoneVerified("Verifying");
-       setTimer({miniutes: 2, seconds: 59});
+       setTimer({minutes: 2, seconds: 59});
        const res = await axios.post(`${BASE_URL}/api/send-sms-otp`, {
          country_code: '+91',
          phone: formData.phone
@@ -200,27 +164,38 @@ const LoginRegister = () => {
   };
   
   return (
-    <> {showDevModal && (
-      <div className="fixed inset-0 z-5 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-300" onClick={() => setShowDevModal(false)}>
-        <div className="bg-white/95 rounded-2xl shadow-2xl text-center border border-gray-200 animate-fadeIn w-[35%]" style={{padding: "24px"}} onClick={(e) => e.stopPropagation()}>
-          <h2 className="text-2xl font-semibold text-gray-800" style={{marginBottom: "8px"}}> ⚠️ Development Mode</h2>
-          <p className="text-gray-600 wrap-break-word" style={{marginBottom: "4px"}}> This website is currently in development phase. Verification features are disabled for testing users. </p> <p className="text-gray-600 wrap-break-word" style={{marginBottom: "12px"}}>You can checkout our website via follow crendentials for all roles including <b>User</b>, <b>Seller</b> and <b>Agent</b>:</p>
-          <div className="bg-gray-100 rounded-xl p-3" style={{marginBottom: "16px"}}>
-            <p className="text-gray-700 text-sm">
-              <strong>Username:</strong>{" "}
-              <span className="text-blue-600 font-medium">user</span> <br />
-              <strong>Password:</strong>{" "}
-              <span className="text-blue-600 font-medium">user123</span>
-            </p>
+    <div className='flex flex-col w-screen h-screen justify-center items-center bg-[url("assets/login_background.jpeg")] bg-cover bg-no-repeat bg-center overflow-x-hidden'>
+
+      {showDevModal && (
+        <div className="fixed inset-0 z-5 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-300" onClick={() => setShowDevModal(false)}>
+          <div className="bg-[#85BDBF] rounded-2xl shadow-2xl text-center border border-[#57737A] animate-fadeIn w-[35%]" style={{padding: "24px"}} onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-2xl font-semibold text-black" style={{fontFamily:"Poppins, sans-serif", marginBottom: "8px"}}> ⚠️ Development Mode</h2>
+            <p className="text-black wrap-break-word" style={{marginBottom: "4px"}}> This website is currently in development phase. Verification features are disabled for testing users. </p> <p className="text-blackwrap-break-word" style={{marginBottom: "12px"}}>You can checkout our website via follow crendentials for all roles including <b>User</b>, <b>Seller</b> and <b>Agent</b>:</p>
+            <div className="bg-[#85BDBF] rounded-xl p-3" style={{marginBottom: "16px"}}>
+              <p className="text-black text-sm" style={{fontFamily:"Montserrat, Poppins, sans-serif"}}>
+                <strong>Username:</strong>{" "}
+                <span className="text-[#0c555b] font-medium">user</span> <br />
+                <strong>Password:</strong>{" "}
+                <span className="text-[#0c555b] font-medium">user123</span>
+              </p>
+            </div>
+            <button onClick={() => { setShowDevModal(false); setIsActive(false); setFormData({...formData, username: "user", password: "user123", }); }} className=" bg-[#048d82] hover:bg-[#025c55] text-white font-medium rounded-lg shadow-md transition-all duration-200" style={{padding: "8px 20px"}}> Login Now </button>
+            <p className="text-xs text-gray-500 italic" style={{marginTop: "20px"}}>For testing purposes only — no real data is stored.</p>
           </div>
-          <button onClick={() => { setShowDevModal(false); setIsActive(false); setFormData({...formData, username: "user", password: "user123", }); }} className=" bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md transition-all duration-200" style={{padding: "8px 20px"}}> Login Now </button>
-          <p className="text-xs text-gray-500 italic" style={{marginTop: "20px"}}>For testing purposes only — no real data is stored.</p>
         </div>
-      </div>
-    )} <div className={`container ${isActive ? 'active' : ''}`}>
-      <div className="form-box login">
-        <form onSubmit={handleLoginSubmit}>
-          <h1>Login</h1>
+      )} 
+
+      {/* Login */}
+      <div className={`absolute top-0 right-0 w-[40%] h-full bg-black/50 backdrop-blur-sm flex flex-col justify-center items-center text-[#ccc] text-center transition-all ease-in-out duration-600 ${isActive ? 'translate-x-[-50%] transform opacity-0 pointer-events-none' : 'delay-100 opacity-100 translate-x-0 transform z-20'}`} style={{ padding: '40px' }}>
+        <div className="flex justify-center items-center gap-4">
+          <img className="bg-[#BCAA99] rounded-[50%]" style={{height:"100px"}} src={'assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
+          <div className='flex flex-col justify-center items-end gap-0' style={{margin:"20px 0"}}>
+            <h1 className='text-[50px] font-bold text-[#BCAA99]' style={{ fontFamily:"Montserrat, Poppins, sans-serif"}}>हुनरBazaar</h1>
+            <p className='text-[12px] font-bold text-[#BCAA99] uppercase' style={{fontFamily:"Montserrat, Poppins, sans-serif"}}>Luxury, Crafted by Talent</p>
+          </div>
+        </div>
+        <h1 className='text-[50px] font-bold text-[#BFB28C]' style={{margin:"20px 0", fontFamily:"Great Vibes, cursive"}}>Login</h1>
+        <form className= "w-full" onSubmit={handleLoginSubmit}>
           <div className="input-box">
             <input type="text" placeholder="Username" name="username" value={formData.username} onChange={handleChange} required />
             <i className='bx bxs-user'></i>
@@ -237,12 +212,16 @@ const LoginRegister = () => {
             <div className={`slider ${formData.userType === 'agents'? 'right': formData.userType === 'users'? 'left': 'middle'} loginS`}></div>
           </div>
         </form>
+        <div className={`w-full h-full text-[#ccc] flex flex-col justify-center items-center`}>
+          <p style={{fontFamily: "'Montserrat', 'Poppins', sans-serif", marginBottom: '8px'}}>Don't have an account?</p>
+          <button className="btn h-[46px] border-2 border-white shadow-none" style={{width:"30%"}} onClick={handleRegisterClick}>Register</button>
+        </div>
       </div>
 
       {/* Registration */}
-      <div className="form-box register">
-        <form onSubmit={handleRegisterSubmit}>
-          <h1>Registration</h1>
+      <div className={`absolute top-0 left-0 w-[40%] h-full overflow-hidden bg-black/50 backdrop-blur-sm flex flex-col justify-center items-center text-[#ccc] text-center transition-all ease-in-out duration-600 ${isActive ? 'translate-x-0 transform delay-100 opacity-100 z-20' : 'translate-x-[50%] transform opacity-0 pointer-events-none'}`} style={{ padding: '40px' }}>
+        <h1 className='text-[50px] font-bold text-[#BFB28C]' style={{margin:"20px 0", fontFamily:"Great Vibes, cursive"}}>Registration</h1>
+        <form className="w-full" onSubmit={handleRegisterSubmit}>
           <div className="input-box">
             <input type="text" placeholder="Username" name="username" value={formData.username} onChange={handleChange} required />
             <i className='bx bxs-user'></i>
@@ -282,24 +261,14 @@ const LoginRegister = () => {
             <div className={`slider ${formData.userType === 'sellers'? 'right': 'left'} registerS`}></div>
           </div>
         </form>
+
+        <div className={`w-full h-full text-[#ccc] flex flex-col justify-center items-center z-2 ${isActive? 'left-0 delay-1200' : 'left-[-50%] delay-600'}`}>
+          <p style={{fontFamily: "'Montserrat', 'Poppins', sans-serif", marginBottom: '8px'}}>Already have an account?</p>
+          <button className="btn w-[10%] h-[46px] border-2 border-white shadow-none" onClick={handleLoginClick}>Login</button>
+        </div>
       </div>
 
-      {/* Toggle */}
-      <div className="toggle-box">
-        <div className="toggle-panel toggle-left">
-          <img className="logo" style={{height:"200px"}}src={'assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
-          <h2>Hello, Welcome!</h2>
-          <p>Don't have an account?</p>
-          <button className="btn register-btn" onClick={handleRegisterClick}>Register</button>
-        </div>
-        <div className="toggle-panel toggle-right">
-          <img className="logo" style={{height:"200px"}}src={'assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>  
-          <h2>Welcome Back!</h2>
-          <p>Already have an account?</p>
-          <button className="btn login-btn" onClick={handleLoginClick}>Login</button>
-        </div>
-      </div> 
-    </div></>
+    </div>
   );
 };
 

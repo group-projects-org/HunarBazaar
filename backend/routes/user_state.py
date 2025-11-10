@@ -8,11 +8,11 @@ from backend.config import db, logger
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from jose import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from backend.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.now(UTC) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -89,10 +89,10 @@ async def register(user: UserDetails):
 
     if userType not in ["users", "sellers"]: raise HTTPException(status_code=400, detail="Invalid userType")
     collection = db[userType]
-    existing_user = await collection.find_one({"$or": [{"username": username}, {"email": email}, {"phone": phone}]})
+    existing_user = await collection.find_one({"$or": [{"email": email}, {"phone": phone}]})
 
     if existing_user:
-        logger.error("❌ User already exists with the same username, email, or phone")
+        logger.error("❌ User already exists with the same email, or phone")
         raise HTTPException(status_code=409, detail="User already exists")
 
     user_data = user.dict()

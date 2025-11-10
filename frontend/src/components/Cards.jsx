@@ -8,7 +8,7 @@ const CategoryCard = ({ category }) => {
     <div className="w-[calc(25%-15px)] border border-[rgba(0,0,0,0.1)] rounded-lg text-center bg-transparent shadow-[0_4px_6px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] slideShowCard" style={{padding: "15px", marginBottom: "15px"}} onClick={() => navigate(`/Products?category=${encodeURIComponent(category)}`)}> 
       <img className='w-full h-[350px] object-cover rounded-[5px]' style={{marginBottom: "10px"}} src={`/assets/Categories/${category}.jpeg`} alt={category} />
       <div>
-        <h3 className='text-[25px] text-[#3CBF4E]' style={{fontFamily: "'Great Vibes', cursive"}}>{category}</h3>
+        <h3 className='text-[25px] text-[#3CBF4E] font-bold' style={{fontFamily: "'Great Vibes', cursive"}}>{category}</h3>
         <p className="gap-2.5" style={{fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"}}>Explore our wide range of {category} products.</p>
       </div>
     </div>

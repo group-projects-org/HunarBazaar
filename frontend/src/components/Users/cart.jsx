@@ -30,7 +30,7 @@ const CartCheckout = () => {
   const [cart, setCart] = useState([]);
   const [step, setStep] = useState("cart");
   const [searchInput, setSearchInput] = useState("");
-	const [billing, setBilling] = useState({name: localStorage.getItem("username") || "", email: "", phone: "", address: "", special_instructions: "", agent_notes: ""});
+	const [billing, setBilling] = useState({name: localStorage.getItem("username") || "", email: "", phone: "", address: "", special_instructions: "", agent_notes: "", location: "", pincode: ""});
 	const location = useLocation();
   const navigate = useNavigate();
 
@@ -61,11 +61,28 @@ const CartCheckout = () => {
   const total = cart.reduce((sum, item) => sum + item.price * item.orderQty, 0);
   
   const handleField = (field) => (e) => {setBilling({ ...billing, [field]: e.target.value });};
+  const handlePincodeChange = async (e) => {
+    const value = e.target.value;
+    setBilling({ ...billing, pincode: value });
+    if (value.length === 6 && /^[0-9]{6}$/.test(value)) {
+      try {
+        const response = await fetch(`https://api.postalpincode.in/pincode/${value}`);
+        const data = await response.json();
+        if (data[0].Status === "Success") {
+          const districtName = data[0].PostOffice[0].District;
+          setBilling((prev) => ({ ...prev, location: districtName }));
+        } else {
+          setBilling((prev) => ({ ...prev, location: "" }));
+          alert("Invalid Pincode");
+        }
+      } catch (error) { console.error("Error fetching district:", error); }
+    } else { setBilling((prev) => ({ ...prev, location: "" })); }
+  };
 	
   const placeOrder = async (e) => {
     e.preventDefault();
-    const { name, email, phone, address } = billing;
-    if (!name || !email || !phone || !address) {
+    const { name, email, phone, address, pincode, location } = billing;
+    if (!name || !email || !phone || !address || !location || !pincode) {
       alert("Please fill out all required fields.");
       return;
     } const orderDetails = { ...billing, cart, total };
@@ -77,8 +94,7 @@ const CartCheckout = () => {
       if (response.status === 409) alert(data.error || "User already exists.");
       else if (response.status === 200) {
         alert("Order placed successfully!");
-        setCart([]);
-        console.log(data);
+        setCart([]); localStorage.setItem('cart', JSON.stringify([]));
         navigate("/thankyou", { state: data });
       } else alert(`Order confirmation failed: ${data.error || "Unknown error"}`);
     } catch (error) {
@@ -128,19 +144,50 @@ const CartCheckout = () => {
             <h1 className="text-3xl text-[#28a745] mb-2" style={{fontFamily: "Montserrat, Poppins, sans-serif", margin: "5px 0px 20px 0px"}}>Billing and Payments</h1>
             <form className="flex flex-col gap-3 w-full items-center" style={{padding: "0 30px"}} onSubmit={placeOrder}>
               <div className="flex justify-between gap-5 w-full">
-                <input className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="text" value={billing.name} onChange={handleField("name")} required />
 
-                <input className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="email" value={billing.email} onChange={handleField("email")} required />
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="username" className="font-bold" style={{padding: "0 3px"}}>Username</label>
+                  <input id="username" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="text" value={billing.name} onChange={handleField("name")} required />
+                </div>
 
-                <input className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="tel" value={billing.phone} onChange={handleField("phone")} required />
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="email" className="font-bold" style={{padding: "0 3px"}}>Email</label>
+                  <input id="email" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="email" value={billing.email} onChange={handleField("email")} required />
+                </div>
+
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="phone" className="font-bold" style={{padding: "0 3px"}}>Phone Number</label>
+                  <input id="phone" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="tel" value={billing.phone} onChange={handleField("phone")} required />
+                </div>
               </div>
 
-              <textarea className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Shipping Address" value={billing.address} onChange={handleField("address")} required/>
+              <div className="w-full flex flex-col justify-center items-start">
+                <label htmlFor="address" className="font-bold" style={{padding: "0 3px"}}>Delivery Destination</label>
+                <textarea id="address" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Shipping Address" value={billing.address} onChange={handleField("address")} required/>
+              </div>
 
-              <div className="flex justify-between gap-5 w-full h-[100px]">
-                <textarea className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Special Instructions, LandMarks" value={billing.special_instructions} onChange={handleField("special_instructions")} />
+              <div className="w-full flex justify-center items-center gap-5">
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="pincode" className="font-bold" style={{padding: "0 3px"}}>Pincode</label>
+                  <input id="pincode" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="text" inputMode="numeric" maxLength="6" pattern="[0-9]{6}" value={billing.pincode} onChange={handlePincodeChange} required />
+                </div>
 
-                <textarea className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Agent Notes" value={billing.agent_notes} onChange={handleField("agent_notes")} />
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="location" className="font-bold" style={{padding: "0 3px"}}>District</label>
+                  <input id="location" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none cursor-not-allowed" style={{padding: "10px 14px"}} type="text" value={billing.location} readOnly onChange={handleField("location")} required />
+                </div>
+              </div>
+
+              <div className="flex justify-between gap-5 w-full h-[120px]">
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="special_ins" className="font-bold" style={{padding: "0 3px"}}>Speical Instructions</label>
+                  <textarea id="special_ins" className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Special Instructions, LandMarks" value={billing.special_instructions} onChange={handleField("special_instructions")} />
+                </div>
+
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="agent_notes" className="font-bold" style={{padding: "0 3px"}}>Agent Notes</label>
+                  <textarea id="agent_notes" className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Agent Notes" value={billing.agent_notes} onChange={handleField("agent_notes")} />
+                </div>
               </div>
 
               <div className="flex justify-center gap-5" style={{marginTop: "10px"}}>

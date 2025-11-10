@@ -62,23 +62,30 @@
 
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
+from werkzeug.security import generate_password_hash
 
 MONGO_URI = "mongodb+srv://khajan_bhatt:Tanuj%4024042005@khajan38.9iqi4n1.mongodb.net/"
 MONGO_DB_NAME = "Secure-Delivery-Data"
 
 async def main():
-    # Connect to MongoDB
     mongo_client = AsyncIOMotorClient(MONGO_URI)
     db = mongo_client[MONGO_DB_NAME]
     agents_collection = db["agents"]
 
-    # Update all documents to set orders = []
-    result = await agents_collection.update_many(
-        {},  # Match all agents
-        {"$set": {"orders": []}}  # Set empty array
+    # Hash the password before saving
+    new_password_hashed = generate_password_hash("sanjana123")
+
+    # Update the password field for the given agent_id
+    result = await agents_collection.update_one(
+        {"agent_id": "65dddef6-e552-49d6-a004-f951eb17b029"},
+        {"$set": {"password": new_password_hashed}}
     )
 
-    print(f"✅ Updated {result.modified_count} agent documents. All 'orders' arrays cleared.")
+    if result.modified_count > 0:
+        print("✅ Password updated successfully.")
+    else:
+        print("⚠️ No matching agent found or password already same.")
+
     mongo_client.close()
 
 if __name__ == "__main__":

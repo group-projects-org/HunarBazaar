@@ -64,10 +64,10 @@ const Header = ( {userType}) => {
           <div className="toast-message error" onClick={() => {if (error !== "Logging Out...") setError(null);}}>{error}</div>
         </>
       )}
-      <div className="relative flex justify-between items-center h-[60px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-linear-to-r from-[#3cbf4e] to-[#2ecc71] z-1000">
+      <div className="relative flex justify-between items-center h-10 sm:h-[60px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-linear-to-r from-[#3cbf4e] to-[#2ecc71] z-1000">
 
         <div className="flex items-center gap-[0.4rem] md:gap-[0.8rem]">
-          <img className="h-[60px] w-auto object-contain" style={{marginLeft: "5px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
+          <img className="h-10 sm:h-[60px] w-auto object-contain" style={{marginLeft: "5px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
           <h1 className="text-[1rem] md:text-[1.6rem] font-bold text-black" style={{ fontFamily: "Eagle Lake, cursive" }}>हुनरBazaar</h1>
         </div>
 
@@ -92,17 +92,30 @@ const Header = ( {userType}) => {
 };
 
 const NavLink = ({ href, icon: Icon, label }) => (
-  <a href={href} className="inline-flex items-center gap-2 text-[16px] no-underline text-white bg-transparent rounded-[7px] transition-colors duration-300 hover:bg-[#3cbf4e] hover:text-white" style={{"padding": "6px 10px"}}
+  <a href={href} className="inline-flex items-center gap-2 text-[12px] md:text-[16px] no-underline text-white bg-transparent rounded-[7px] transition-colors duration-300 hover:bg-[#3cbf4e] hover:text-white" style={{"padding": "6px 10px"}}
   > <Icon /> {label} </a>
 );
 
-const Navbar = ({ tabs }) => (
-  <nav className="flex justify-center items-center gap-5 bg-[#444] shadow-[0_4px_6px_rgba(0,0,0,0.1)]" style={{"padding": "10px"}}>
-    {tabs.map(([href, Icon, label]) => (
-      <NavLink key={label} href={href} icon={Icon} label={label} />
-    ))}
-  </nav>
-);
+const Navbar = ({ tabs }) => {
+  const [navVisible, setNavVisible] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  useEffect(() => {
+    if (windowWidth >= 768) setNavVisible(true);
+  }, [windowWidth]);
+  return (
+    <nav className="flex flex-col md:flex-row justify-center md:items-center gap-0 md:gap-5 bg-[#444] shadow-[0_4px_6px_rgba(0,0,0,0.1)]" style={{ padding: windowWidth >= 768 ? "10px" : "5px" }}>
+      <button onClick={() => setNavVisible((prev) => !prev)} className="md:hidden rounded-[50%] border border-[#3cbf4e] text-[#97c09c] text-[10px] w-5 h-5" style={{marginBottom:"2px", padding:"0"}}> ☰ </button>
+      {(navVisible || windowWidth >= 768) && (
+        <div className="flex flex-col md:flex-row gap-3">{tabs.map(([href, Icon, label]) => (<NavLink key={label} href={href} icon={Icon} label={label} />))}</div>
+      )}
+    </nav>
+  );
+};
 
 const Footer = () => {
   const [userEmail, setUserEmail] = useState(null);
@@ -136,20 +149,20 @@ const Footer = () => {
 
   return (
     <footer>
-      <div className="flex flex-col md:flex-row justify-around bg-[#f8f8f8] gap-10 md:gap-5 overflow-hidden" style={{padding: "20px"}}>
+      <div className="flex flex-col md:flex-row justify-around bg-[#f8f8f8] gap-5 overflow-hidden" style={{padding: "20px"}}>
         <div className="flex-1 flex flex-col text-center w-full">
-          <h3 className='text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Special Offers</h3>
-          <p className="text-[1rem] text-[#666666] block w-[90%] leading-relaxed" style={{margin: "2px auto auto auto", fontFamily: "'Segoe UI', sans-serif"}}>Check out our latest offers on clothing and apparel! <b>NEW ARRIVALS and SPECIAL COMBO OFFERS</b> designed just for you !!!</p>
+          <h3 className='text-[1rem] md:text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Special Offers</h3>
+          <p className="text-[0.8rem] md:text-[1rem] text-[#666666] block w-[90%] leading-relaxed" style={{margin: "2px auto auto auto", fontFamily: "'Segoe UI', sans-serif"}}>Check out our latest offers on clothing and apparel! <b>NEW ARRIVALS and SPECIAL COMBO OFFERS</b> designed just for you !!!</p>
         </div>
         <div className="flex-1 flex flex-col text-center">
-          <h3 className='text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Subscribe to Our Newsletter</h3>
+          <h3 className='text-[1rem] md:text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Subscribe to Our Newsletter</h3>
           <form onSubmit={handleSubscription}>
-            <input type="email" defaultValue={userEmail} className="text-[1rem] text-[#666666] block w-[80%] rounded-[5px] border border-[#bcb9b9]" style={{margin: "auto auto 14px auto", padding: "10px"}} required />
-            <button type="submit" className={`${subscribed ? "bg-red-500 hover:bg-red-600" : "bg-[#3cbf4e] hover:bg-[#45a049]"} text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)]`} style={{padding: "8px 12px"}}>{subscribed? "Cancel" : "Subscribe"}</button>
+            <input type="email" defaultValue={userEmail} className="text-[0.8rem] md:text-[1rem] text-[#666666] block w-[80%] rounded-[5px] border border-[#bcb9b9]" style={{margin: "auto auto 14px auto", padding: "10px"}} required />
+            <button type="submit" className={`${subscribed ? "bg-red-500 hover:bg-red-600" : "bg-[#3cbf4e] hover:bg-[#45a049]"} text-white border-0 rounded-[5px] cursor-pointer text-[0.8rem] md:text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)]`} style={{padding: "8px 12px"}}>{subscribed? "Cancel" : "Subscribe"}</button>
           </form>
         </div>
         <div className="flex-1 flex flex-col text-center">
-          <h3 className='text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Connect With Developer</h3>
+          <h3 className='text-[1rem] md:text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Connect With Developer</h3>
           {links.map(([name, url, icon], idx)=> {
           return (
             <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="text-[#45a049] hover:text-black transition-colors duration-300 no-underline text-[0.9rem] flex items-center justify-start wrap-break-all " style={{marginBottom: "7px", paddingLeft: "20%", fontFamily: "Poppins, sans-serif"}} >

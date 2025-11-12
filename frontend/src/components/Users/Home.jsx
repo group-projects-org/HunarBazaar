@@ -9,6 +9,8 @@ const Home = () => {
   const [error, setError] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [numOfCategories, setNoOfCategories] = useState(() => 
+    typeof window !== "undefined" && window.innerWidth >= 768 ? 10 : 6);
   const slides = useRef([]);
 
   useEffect(() => {
@@ -52,15 +54,20 @@ const Home = () => {
         <button className="h-[50%] top-0 cursor-pointer absolute left-[0.5px] text-black font-bold text-[30px] bg-transparent border-0 shadow-none active:border-2 active:border-black active:shadow-[0_0_0_1.5px_#ddd] hover:bg-white/10 hover:backdrop-blur-sm transition-all duration-300" style={{padding: "10px 15px"}} onClick={handlePrev}> &#10094; </button>
         <button className="h-[50%] top-0 cursor-pointer absolute right-[0.5px] text-black font-bold text-[30px] bg-transparent border-0 shadow-none active:border-2 active:border-black active:shadow-[0_0_0_1.5px_#ddd] hover:bg-white/10 hover:backdrop-blur-sm transition-all duration-300" style={{padding: "10px 15px"}}onClick={handleNext}> &#10095; </button>
       </div>
+
       <MarqueeCard announcements={["🎉 Mega Festive Sale — Up to 70% OFF on all categories!", "🚚 Free Delivery on Orders Above ₹499!", "🔥 Flash Deal: Buy 2 Get 1 FREE on Select Items!", "🕒 Hurry! Limited-Time Offers Ending Soon!", "🎁 Exclusive Combo Offers Available Today!", "🌟 New Arrivals — Fresh Styles Just Dropped!", "🛍️ Flat ₹200 OFF on Your First Purchase!", "💥 Clearance Sale — Grab Before It’s Gone!", "✨ Join Trendify Plus & Get Early Access to Big Sales!"]} />
+
       <div className="relative border-0 bg-transparent shadow-none w-full text-center rounded-lg" style={{ padding: '10px 20px' }}>
         <h1 className="font-bold text-xl md:text-2xl" style={{fontFamily: "Merriweather, Cambria, serif"}}>Our Categories</h1>
-        <div className="flex flex-wrap justify-center gap-5 w-full box-border custom-container" style={{margin: "0"}}>
-          {categories.map((listItem, index) => (<CategoryCard key={listItem.id || index} category={listItem} />))}
+        <div className="flex flex-wrap justify-center gap-3 md:gap-5 w-full box-border custom-container" style={{margin:"0"}}>
+          {categories.slice(0, numOfCategories).map((listItem, index) => (<CategoryCard key={listItem.id || index} category={listItem} />))}
         </div>
+        {numOfCategories < categories.length && (
+          <button  className="bg-[#3cbf4e] hover:bg-[#45a049] text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)]" style={{padding: "8px 12px", margin:"10px"}} onClick={() => setNoOfCategories(Math.min(categories.length, numOfCategories + 4))}>Load More...</button>
+        )}
       </div>
       <Footer />
-      <style>{`.custom-container { margin: 0;}
+      <style>{`.custom-container { margin: 0; }
         @media (min-width: 1024px) {.custom-container { padding: 20px; }}
       `}</style>
     </div>

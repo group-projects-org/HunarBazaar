@@ -70,14 +70,14 @@ MONGO_DB_NAME = "Secure-Delivery-Data"
 async def main():
     mongo_client = AsyncIOMotorClient(MONGO_URI)
     db = mongo_client[MONGO_DB_NAME]
-    agents_collection = db["agents"]
+    agents_collection = db["users"]
 
     # Hash the password before saving
-    new_password_hashed = generate_password_hash("sanjana123")
+    new_password_hashed = generate_password_hash("vineet123")
 
     # Update the password field for the given agent_id
     result = await agents_collection.update_one(
-        {"agent_id": "65dddef6-e552-49d6-a004-f951eb17b029"},
+        {"user_id": "b7d3087e-3d2c-4772-be42-0cd583ebff81"},
         {"$set": {"password": new_password_hashed}}
     )
 

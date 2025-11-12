@@ -164,11 +164,11 @@ const LoginRegister = () => {
   };
   
   return (
-    <div className='flex flex-col w-screen h-screen justify-center items-center bg-[url("login_background.jpeg")] bg-cover bg-no-repeat bg-center overflow-x-hidden'>
+    <div className='flex flex-col min-h-screen w-full justify-center items-center bg-[url("/assets/login_background.jpeg")] bg-cover bg-no-repeat bg-center overflow-hidden'>
 
       {showDevModal && (
-        <div className="fixed inset-0 z-5 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-300" onClick={() => setShowDevModal(false)}>
-          <div className="bg-[#85BDBF] rounded-2xl shadow-2xl text-center border border-[#57737A] animate-fadeIn w-[35%]" style={{padding: "24px"}} onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-300" onClick={() => setShowDevModal(false)}>
+          <div className="bg-[#85BDBF] rounded-2xl shadow-2xl text-center border border-[#57737A] animate-fadeIn w-[80%] sm:w-[35%]" style={{padding: "24px"}} onClick={(e) => e.stopPropagation()}>
             <h2 className="text-2xl font-semibold text-black" style={{fontFamily:"Poppins, sans-serif", marginBottom: "8px"}}> ⚠️ Development Mode</h2>
             <p className="text-black wrap-break-word" style={{marginBottom: "4px"}}> This website is currently in development phase. Verification features are disabled for testing users. </p> <p className="text-blackwrap-break-word" style={{marginBottom: "12px"}}>You can checkout our website via follow crendentials for all roles including <b>User</b>, <b>Seller</b> and <b>Agent</b>:</p>
             <div className="bg-[#85BDBF] rounded-xl p-3" style={{marginBottom: "16px"}}>
@@ -184,13 +184,14 @@ const LoginRegister = () => {
           </div>
         </div>
       )} 
+    <div className="relative flex flex-col min-h-screen w-full justify-center items-center bg-[url('/assets/login_background.jpeg')] bg-cover bg-no-repeat bg-center overflow-hidden">
 
       {/* Login */}
-      <div className={`absolute top-0 right-0 w-[40%] h-full bg-black/50 backdrop-blur-sm flex flex-col justify-center items-center text-[#ccc] text-center transition-all ease-in-out duration-600 ${isActive ? 'translate-x-[-50%] transform opacity-0 pointer-events-none' : 'delay-100 opacity-100 translate-x-0 transform z-20'}`} style={{ padding: '40px' }}>
+      <div className={`absolute top-0 right-0 w-full md:w-[40%] h-full bg-black/50 backdrop-blur-sm flex flex-col justify-center items-center text-[#ccc] text-center transition-all ease-in-out duration-600 ${isActive ? 'translate-x-[-50%] transform opacity-0 pointer-events-none' : 'delay-100 opacity-100 translate-x-0 transform z-20'}`} style={{ padding: '40px' }}>
         <div className="flex justify-center items-center gap-4">
-          <img className="bg-[#BCAA99] rounded-[50%]" style={{height:"100px"}} src={'assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
+          <img className="bg-[#BCAA99] rounded-[50%]" style={{height:"100px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
           <div className='flex flex-col justify-center items-end gap-0' style={{margin:"20px 0"}}>
-            <h1 className='text-[50px] font-bold text-[#BCAA99]' style={{ fontFamily:"Montserrat, Poppins, sans-serif"}}>हुनरBazaar</h1>
+            <h1 className='text-[40px] sm:text-[50px] font-bold text-[#BCAA99]' style={{ fontFamily:"Montserrat, Poppins, sans-serif"}}>हुनरBazaar</h1>
             <p className='text-[12px] font-bold text-[#BCAA99] uppercase' style={{fontFamily:"Montserrat, Poppins, sans-serif"}}>Luxury, Crafted by Talent</p>
           </div>
         </div>
@@ -219,7 +220,14 @@ const LoginRegister = () => {
       </div>
 
       {/* Registration */}
-      <div className={`absolute top-0 left-0 w-[40%] h-full overflow-hidden bg-black/50 backdrop-blur-sm flex flex-col justify-center items-center text-[#ccc] text-center transition-all ease-in-out duration-600 ${isActive ? 'translate-x-0 transform delay-100 opacity-100 z-20' : 'translate-x-[50%] transform opacity-0 pointer-events-none'}`} style={{ padding: '40px' }}>
+      <div className={`absolute top-0 left-0 w-full sm:w-[40%] h-full overflow-hidden bg-black/50 backdrop-blur-sm flex flex-col justify-center items-center text-[#ccc] text-center transition-all ease-in-out duration-600 ${isActive ? 'translate-x-0 transform delay-100 opacity-100 z-20' : 'translate-x-[50%] transform opacity-0 pointer-events-none'}`} style={{ padding: '40px' }}>
+        <div className="flex lg:hidden justify-center items-center gap-4">
+          <img className="bg-[#BCAA99] rounded-[50%]" style={{height:"100px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
+          <div className='flex flex-col justify-center items-end gap-0' style={{margin:"20px 0"}}>
+            <h1 className='text-[40px] sm:text-[50px] font-bold text-[#BCAA99]' style={{ fontFamily:"Montserrat, Poppins, sans-serif"}}>हुनरBazaar</h1>
+            <p className='text-[12px] font-bold text-[#BCAA99] uppercase' style={{fontFamily:"Montserrat, Poppins, sans-serif"}}>Luxury, Crafted by Talent</p>
+          </div>
+        </div>
         <h1 className='text-[50px] font-bold text-[#BFB28C]' style={{margin:"20px 0", fontFamily:"Great Vibes, cursive"}}>Registration</h1>
         <form className="w-full" onSubmit={handleRegisterSubmit}>
           <div className="input-box">
@@ -267,7 +275,7 @@ const LoginRegister = () => {
           <button className="btn w-[10%] h-[46px] border-2 border-white shadow-none" onClick={handleLoginClick}>Login</button>
         </div>
       </div>
-
+    </div>
     </div>
   );
 };

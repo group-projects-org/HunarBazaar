@@ -5,11 +5,11 @@ import { useNavigate } from "react-router-dom";
 const CategoryCard = ({ category }) => {
   const navigate = useNavigate();
   return(
-    <div className="w-[calc(25%-15px)] border border-[rgba(0,0,0,0.1)] rounded-lg text-center bg-transparent shadow-[0_4px_6px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] slideShowCard" style={{padding: "15px", marginBottom: "15px"}} onClick={() => navigate(`/Products?category=${encodeURIComponent(category)}`)}> 
-      <img className='w-full h-[350px] object-cover rounded-[5px]' style={{marginBottom: "10px"}} src={`/assets/Categories/${category}.jpeg`} alt={category} />
+    <div className="w-[45%] md:w-[calc(50%-30px)] lg:w-[calc(25%-15px)] border border-[rgba(0,0,0,0.1)] rounded-lg text-center bg-transparent shadow-[0_4px_6px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] slideShowCard overflow-hidden" style={{padding: "15px", marginBottom: "15px"}} onClick={() => navigate(`/Products?category=${encodeURIComponent(category)}`)}> 
+      <img className='w-full h-[200px] md:h-[450px] lg:h-[350px] object-cover rounded-[5px]' style={{marginBottom: "10px"}} src={`/assets/Categories/${category}.jpeg`} alt={category} />
       <div>
-        <h3 className='text-[25px] text-[#3CBF4E] font-bold' style={{fontFamily: "'Great Vibes', cursive"}}>{category}</h3>
-        <p className="gap-2.5" style={{fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"}}>Explore our wide range of {category} products.</p>
+        <h3 className='text-[20px] md:text-[25px] text-[#3CBF4E] font-bold' style={{fontFamily: "'Great Vibes', cursive"}}>{category}</h3>
+        <p className="text-[10px] md:text-[16px] gap-2.5 break-word" style={{fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"}}>Explore our wide range of {category} products.</p>
       </div>
     </div>
   )
@@ -90,8 +90,8 @@ const MarqueeCard = ({ announcements = ["🎉 Mega Festive Sale — Up to 70% OF
       }
     `}</style>
 
-    <div ref={containerRef} className="marquee-container w-[109%] scrolling-text-container relative rounded-md overflow-hidden bg-white/10 backdrop-blur-sm transition-all duration-300" style={{margin: "0 0px 0 -50px", padding: "0"}}>
-      <div ref={textRef} className="marquee-content inline-flex whitespace-nowrap text-[16px] font-semibold" style={{"--scroll-distance": direction === "left" ? `-${distance}px` : `${distance}px`, animationDuration: duration, padding: "8px 0"}}>
+    <div ref={containerRef} className="marquee-container w-[109%] scrolling-text-container relative rounded-md overflow-hidden bg-white/10 backdrop-blur-sm transition-all duration-300" style={{margin:"0", padding: "0"}}>
+      <div ref={textRef} className="marquee-content inline-flex whitespace-nowrap text-[10px] md:text-[16px] font-semibold" style={{"--scroll-distance": direction === "left" ? `-${distance}px` : `${distance}px`, animationDuration: duration, padding: "8px 0"}}>
         {[...announcements, ...announcements].map((text, i) => (
           <span key={i} style={{ padding: "0 30px", fontFamily: "'Bricolage Grotesque', sans-serif" }}> {text} </span>
         ))}

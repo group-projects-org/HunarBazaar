@@ -66,17 +66,17 @@ const Header = ( {userType}) => {
       )}
       <div className="relative flex justify-between items-center h-[60px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-linear-to-r from-[#3cbf4e] to-[#2ecc71] z-1000">
 
-        <div className="flex items-center gap-[0.8rem]">
-          <img className="h-[60px] w-auto object-contain" style={{marginLeft: "15px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
-          <h1 className="text-[1.6rem] font-bold text-black" style={{ fontFamily: "Eagle Lake, cursive" }}>हुनरBazaar</h1>
+        <div className="flex items-center gap-[0.4rem] md:gap-[0.8rem]">
+          <img className="h-[60px] w-auto object-contain" style={{marginLeft: "5px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
+          <h1 className="text-[1rem] md:text-[1.6rem] font-bold text-black" style={{ fontFamily: "Eagle Lake, cursive" }}>हुनरBazaar</h1>
         </div>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2">
+        <div className="hidden sm:block absolute left-1/2 transform -translate-x-1/2">
           <small className="text-[14px] text-black font-light leading-[1.2] tracking-[1px] uppercase text-center whitespace-nowrap" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }} > "Skill in every hand, Market at every doorstep" </small>
         </div>
 
         <div ref={dropdownRef} className="flex items-center gap-4 text-black relative cursor-pointer" style={{marginRight: "15px"}} onClick={() => setDropdownVisible(!dropdownVisible)} >
-          <span className="overflow-hidden hover:text-[#333]" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>{localStorage.getItem("username")}</span>
+          <span className="overflow-hidden hover:text-[#333]" style={{ fontFamily: "Bricolage Grotesque, sans-serif" }}>{localStorage.getItem("username")}</span>
           <img src={'/assets/User.jpg'} alt="User" className="w-8 h-8 rounded-[50%] bg-[#2563eb] text-white flex items-center justify-center font-medium" />
           {dropdownVisible && (
           <div className="absolute top-full whitespace-nowrap right-0 bg-white shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-sm z-10" style={{padding: "8px"}}>
@@ -136,7 +136,7 @@ const Footer = () => {
 
   return (
     <footer>
-      <div className="flex justify-around bg-[#f8f8f8] gap-5 overflow-hidden" style={{padding: "20px"}}>
+      <div className="flex flex-col md:flex-row justify-around bg-[#f8f8f8] gap-10 md:gap-5 overflow-hidden" style={{padding: "20px"}}>
         <div className="flex-1 flex flex-col text-center w-full">
           <h3 className='text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Special Offers</h3>
           <p className="text-[1rem] text-[#666666] block w-[90%] leading-relaxed" style={{margin: "2px auto auto auto", fontFamily: "'Segoe UI', sans-serif"}}>Check out our latest offers on clothing and apparel! <b>NEW ARRIVALS and SPECIAL COMBO OFFERS</b> designed just for you !!!</p>

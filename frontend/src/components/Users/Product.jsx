@@ -66,7 +66,7 @@ const ProductsPage = () => {
   ); 
 
   return (
-    <>
+    <div className='relative h-full w-full overflow-hidden'>
     {loading && (<>
       <div className="toast-overlay" />
       <div className="toast-message processing">Loading the Data...</div>
@@ -76,18 +76,20 @@ const ProductsPage = () => {
     </>)}
      <Header />
 
-     <div className="flex items-center justify-center gap-2.5 bg-[#f2f2f2] rounded-lg" style={{margin: "20px 0", padding: "10px"}}>
+     <div className="flex flex-col md:flex-row items-center justify-center gap-2.5 bg-transparent md:bg-[#f2f2f2] rounded-lg my-3 md:my-5 mx-auto p-2.5">
         <input className="w-[250px] text-[1rem] border-[#ddd] border-2 rounded-[5px]" style={{padding: "10px"}} type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..." />
-        <select className="w-[150px] text-[1rem] border-2 border-[#ddd] rounded-[5px]" style={{padding: "10px"}} value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-          {categories.map((cat, idx) => <option key={idx} value={cat}>{cat}</option>)}
+      <div className='flex items-center justify-center gap-2.5 bg-transparent rounded-lg'>
+        <select className="w-full sm:w-[180px] md:w-[200px] lg:w-[150px] text-[1rem] border-2 border-[#ddd] bg-[#f2f2f2] rounded-[5px] transition-all duration-300 overflow-hidden " style={{padding: "10px"}} value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+          {categories.map((cat, idx) => (<option key={idx} value={cat} className="w-fit whitespace-nowrap text-[0.5rem] sm:text-[1rem]"> {cat} </option> ))}
         </select>
-        <a className="bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049]" style={{padding: "10px 15px"}} href="/CartCheckout">View Cart</a>
-        <a className={`bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] ${cart.length === 0 ? "bg-[#ccc] text-[#666] cursor-not-allowed opacity-60 pointer-events-none" : ""}`} href={cart.length === 0 ? "#" : `/CartCheckout?step=${encodeURIComponent("checkout")}`} onClick={(e) => { if (cart.length === 0) e.preventDefault();}} style={{padding: "10px 15px"}}> Checkout </a>
+        <a className="bg-[#3cbf4e] h-11 whitespace-nowrap text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] px-[15px] py-2.5" href="/CartCheckout">View Cart</a>
+        <a className={`bg-[#3cbf4e] px-[15px] py-2.5 h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] ${cart.length === 0 ? "bg-[#ccc] text-[#666] cursor-not-allowed opacity-60 pointer-events-none" : ""}`} href={cart.length === 0 ? "#" : `/CartCheckout?step=${encodeURIComponent("checkout")}`} onClick={(e) => { if (cart.length === 0) e.preventDefault();}}> Checkout </a>
+        </div>
      </div>
 
-     <div className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "10px 20px"}}>
-        <h1 className="font-bold text-2xl" style={{fontFamily: "Merriweather, Cambria, serif", margin: "10px"}}>Our Products</h1>
-        <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}>
+     <div className="block w-full max-w-[1200px] text-center bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] m-0 md:my-7 mx-auto px-5 py-2.5">
+        <h1 className="font-bold text-2xl m-2.5" style={{fontFamily: "Merriweather, Cambria, serif"}}>Our Products</h1>
+        <div className="flex flex-wrap justify-center gap-5 w-full box-border p-5">
           {paginatedProducts.map(product => {
             return ( <ProductCard product={product} key={product.id} /> );
           })}
@@ -95,16 +97,16 @@ const ProductsPage = () => {
 
         <div>
           {currentPage > 1 && (
-            <button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] transition-colors duration-300 decoration-0" style={{padding: "8px 12px", margin: "5px"}} onClick={() => setCurrentPage(currentPage - 1)}>&#10094;</button>
+            <button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] transition-colors duration-300 decoration-0 py-2 px-3 m-[5px]" onClick={() => setCurrentPage(currentPage - 1)}>&#10094;</button>
           )}
-          <button className="bg-[#3cbf4e] text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049]" style={{padding: "10px 15px"}}>{currentPage}</button>
+          <button className="bg-[#3cbf4e] text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] py-2.5 px-[15px]">{currentPage}</button>
           {currentPage * productsPerLoad < filteredProducts.length && (
-            <button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] transition-colors duration-300 decoration-0" style={{padding: "8px 12px", margin: "5px"}} onClick={() => setCurrentPage(currentPage + 1)}>&#10095;</button>
+            <button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] transition-colors duration-300 decoration-0 py-2 px-3 m-[5px]" onClick={() => setCurrentPage(currentPage + 1)}>&#10095;</button>
           )}
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

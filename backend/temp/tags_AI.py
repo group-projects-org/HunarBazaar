@@ -59,34 +59,39 @@
 #     while len(tags) < 4:
 #         tags.append(random.choice(random.choice(list(tag_categories.values()))))
 #     return list(set(tags))
-
-import asyncio
+import asyncio, random
 from motor.motor_asyncio import AsyncIOMotorClient
-from werkzeug.security import generate_password_hash
 
 MONGO_URI = "mongodb+srv://khajan_bhatt:Tanuj%4024042005@khajan38.9iqi4n1.mongodb.net/"
 MONGO_DB_NAME = "Secure-Delivery-Data"
 
 async def main():
-    mongo_client = AsyncIOMotorClient(MONGO_URI)
-    db = mongo_client[MONGO_DB_NAME]
-    agents_collection = db["users"]
+    client = AsyncIOMotorClient(MONGO_URI)
+    db = client[MONGO_DB_NAME]
+    collection_products = db["product_list"]
+    cursor = collection_products.find({})
 
-    # Hash the password before saving
-    new_password_hashed = generate_password_hash("vineet123")
+    async for product in cursor:
+        product_id = product["product_id"]
 
-    # Update the password field for the given agent_id
-    result = await agents_collection.update_one(
-        {"user_id": "b7d3087e-3d2c-4772-be42-0cd583ebff81"},
-        {"$set": {"password": new_password_hashed}}
-    )
+        for variant in product.get("variants", []):
+            size = variant["size"]
+            inc_update = {}
 
-    if result.modified_count > 0:
-        print("✅ Password updated successfully.")
-    else:
-        print("⚠️ No matching agent found or password already same.")
+            for color in variant["options"].keys():
+                add_qty = random.randint(700, 5000)
+                inc_update[f"variants.$[v].options.{color}"] = add_qty
 
-    mongo_client.close()
+            if inc_update:
+                await collection_products.update_one(
+                    {"product_id": product_id},
+                    {"$inc": inc_update},
+                    array_filters=[{"v.size": size}]
+                )
+
+        print(f"Updated product {product_id}")
+
+    print("✔ All product quantities increased successfully!")
 
 if __name__ == "__main__":
     asyncio.run(main())

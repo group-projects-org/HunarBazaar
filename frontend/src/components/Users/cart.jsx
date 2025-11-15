@@ -13,8 +13,11 @@ const safeParse = (key) => {
   } catch { return []; }
 };
 
-const ProductCards = ({ cart, editable = false, setCart }) => {
-  if (!cart || cart.length === 0) return <p>Your cart is empty.</p>;
+const ProductCards = ({ cart, navigate, editable = false, setCart }) => {
+  if (!cart || cart.length === 0) return(<div className="flex flex-col">
+    <div className="text-gray-500 italic mb-4 text-sm"> Your cart is empty... </div>
+    <button className="bg-[#3cbf4e] hover:bg-[#45a049] text-white border-0 rounded-[5px] cursor-pointer text-[0.8rem] md:text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] px-3 py-2" onClick={() => navigate('/Products')}>Start Shopping Now</button>
+  </div>);
   return (
     <>
       {cart.map(({ id, name, price, image, orderQty, orderSize, orderColor, maxQty }, index)=>(
@@ -30,7 +33,7 @@ const CartCheckout = () => {
   const [cart, setCart] = useState([]);
   const [step, setStep] = useState("cart");
   const [searchInput, setSearchInput] = useState("");
-	const [billing, setBilling] = useState({name: localStorage.getItem("username") || "", email: "", phone: "", address: "", special_instructions: "", agent_notes: "", location: "", pincode: ""});
+	const [billing, setBilling] = useState({name: localStorage.getItem("username") || "", email: "", phone: "", address: "", special_instructions: "", agent_notes: "", location: "", pincode: null});
 	const location = useLocation();
   const navigate = useNavigate();
 
@@ -98,10 +101,14 @@ const CartCheckout = () => {
         navigate("/thankyou", { state: data });
       } else alert(`Order confirmation failed: ${data.error || "Unknown error"}`);
     } catch (error) {
-      console.error("Order confirmation error:", error);
-      alert("An error occurred during order confirmation.");
-    }
-  };
+      console.error("ORDER ERROR FULL OBJECT:", error);
+      if (error.response) {
+        console.error("STATUS:", error.response.status);
+        console.error("RESPONSE DATA:", error.response.data);
+        console.error("HEADERS:", error.response.headers);
+      } else {console.error("NO RESPONSE (NETWORK/CONFIG ERROR):", error.message);}
+    alert("An error occurred during order confirmation.");
+  }};
 
   if (loading) return (<>
     <div className="toast-overlay" />
@@ -112,93 +119,95 @@ const CartCheckout = () => {
   </>);
 
   return (
-    <><Header />
+    <div className='relative h-full w-full overflow-hidden'>
+      <Header />
       {step === "cart" && (
-        <section className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "10px 20px"}}>
-          <h1 className="font-bold text-2xl" style={{fontFamily: "Merriweather, Cambria, serif", margin: "10px"}}>Your Cart</h1>
-          <div className="flex items-center justify-center gap-2.5 bg-[#f2f2f2] rounded-lg" style={{margin: "10px 0", padding: "10px"}}>
-            <input className="w-[250px] text-[1rem] border-[#ddd] border-2 rounded-[5px]" style={{padding: "10px"}} type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..." />
+        <section className="block w-full max-w-[1200px] text-center bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] md:my-10 mx-auto py-2.5 px-5">
+          <h1 className="font-bold text-2xl m-2.5" style={{fontFamily: "Merriweather, Cambria, serif"}}>Your Cart</h1>
+          <div className="flex items-center justify-center gap-2.5 bg-[#f2f2f2] rounded-lg my-2.5 mx-0 p-2.5">
+            <input className="w-[250px] text-[1rem] border-[#ddd] border-2 rounded-[5px] p-2.5" type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..." />
 
-            <button className={`bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] ${cart.length === 0 ? "bg-[#ccc] text-[#666] cursor-not-allowed opacity-60 pointer-events-none" : ""}`} disabled={cart.length === 0 || localStorage.getItem("userType") === "agent"? true: false} onClick={() => setStep("checkout")} style={{padding: "10px 15px"}}> Checkout</button>
+            <button className={`bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 decoration-0 hover:bg-[#45a049] py-2.5 px-[15px] ${cart.length === 0 ? "bg-[#ccc] text-[#666] cursor-not-allowed opacity-60 pointer-events-none" : "" }`} disabled={cart.length === 0 || localStorage.getItem("userType") === "agent"? true: false} onClick={() => setStep("checkout")}> Checkout</button>
           </div>
-          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={filteredCart} editable={true} setCart={setCart}/></div>
+          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border p-5"><ProductCards cart={filteredCart} navigate={navigate} editable={true} setCart={setCart}/></div>
         </section>
       )}
 
       {step === "checkout" && (
-        <section className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "10px 20px"}}>
-          <h1 className="font-bold text-2xl" style={{fontFamily: "Merriweather, Cambria, serif", margin: "10px"}}>Checkout</h1>
-          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{padding: "20px"}}><ProductCards cart={cart} editable={false} setCart={setCart}/></div>
+        <section className="block w-full max-w-[1200px] text-center bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] md:my-10 mx-auto py-2.5 px-5">
+          <h1 className="font-bold text-2xl m-2.5" style={{fontFamily: "Merriweather, Cambria, serif"}}>Checkout</h1>
+          <div className="flex flex-wrap justify-center gap-[15px] w-full box-border p-5"><ProductCards cart={cart} navigate={navigate} editable={false} setCart={setCart}/></div>
 
 					{cart.length > 0 && (
-						<div className="w-[70vw] max-w-none border border-[#ccc] rounded-2xl bg-[#f9f9f9] hover:cursor-not-allowed" style={{margin: "10px auto 70px auto", padding: "30px 40px"}}>
-							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span>Total Items</span><span>{cart.length}</span></div>
-							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span>Cart Total</span><span>₹ {total.toFixed(2)}</span></div>
-							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span>Delivery Charges</span><span className="price">₹ 40</span></div>
-							<hr />
-							<div className="flex items-center justify-between font-larger text-[17px] font-bold" style={{fontFamily: "Merriweather, Cambria, serif", padding: "2px 0px"}}><span className="font-bold">Order Total</span><span className="price">₹ {(total + 40).toFixed(2)}</span></div>
+						<div className="w-[90%] sm:w-[70vw] max-w-none border border-[#ccc] rounded-2xl bg-[#f9f9f9] hover:cursor-not-allowed mt-2.5 mr-auto mb-12.5 ml-auto p-5 md:py-7.5 md:px-10">
+							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span>Total Items</span><span>{cart.length}</span></div>
+							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span>Cart Total</span><span>₹ {total.toFixed(2)}</span></div>
+							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span>Delivery Charges</span><span className="price">₹ 40</span></div>
+							<hr className="m-2" />
+							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span className="md:font-bold">Order Total</span><span className="price">₹ {(total + 40).toFixed(2)}</span></div>
 						</div>
 					)}
 
-          <div className="bg-[#f9f9f9] w-[90%] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)]" style={{fontFamily: "'Segoe UI', sans-serif", margin: "20px auto", padding: "24px"}}>
-            <h1 className="text-3xl text-[#28a745] mb-2" style={{fontFamily: "Montserrat, Poppins, sans-serif", margin: "5px 0px 20px 0px"}}>Billing and Payments</h1>
-            <form className="flex flex-col gap-3 w-full items-center" style={{padding: "0 30px"}} onSubmit={placeOrder}>
-              <div className="flex justify-between gap-5 w-full">
+          <div className="bg-[#f9f9f9] w-[90%] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] my-5 mb-10 md:mb-5 mx-auto py-6 px-10 md:py-10 md:px-14" style={{fontFamily: "'Segoe UI', sans-serif"}}>
+            <h1 className="text-3xl text-[#28a745] mt-[5px] mr-0 my-5 ml" style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>Billing and Payments</h1>
+            <form className="flex flex-col gap-3 w-full items-center py-0 px-0.5" onSubmit={placeOrder}>
+              <div className="flex flex-col md:flex-row justify-between gap-5 w-full">
 
                 <div className="w-full flex flex-col justify-center items-start">
-                  <label htmlFor="username" className="font-bold" style={{padding: "0 3px"}}>Username</label>
-                  <input id="username" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="text" value={billing.name} onChange={handleField("name")} required />
+                  <label htmlFor="username" className="font-bold py-0 px-0.5">Username</label>
+                  <input id="username" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none py-2.5 px-3.5 cursor-not-allowed" type="text" value={billing.name} onChange={handleField("name")} readOnly required />
                 </div>
 
                 <div className="w-full flex flex-col justify-center items-start">
-                  <label htmlFor="email" className="font-bold" style={{padding: "0 3px"}}>Email</label>
-                  <input id="email" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="email" value={billing.email} onChange={handleField("email")} required />
+                  <label htmlFor="email" className="font-bold py-0 px-0.5">Email</label>
+                  <input id="email" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none py-2.5 px-3.5 cursor-not-allowed" type="email" value={billing.email} onChange={handleField("email")} readOnly required />
                 </div>
 
                 <div className="w-full flex flex-col justify-center items-start">
-                  <label htmlFor="phone" className="font-bold" style={{padding: "0 3px"}}>Phone Number</label>
-                  <input id="phone" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="tel" value={billing.phone} onChange={handleField("phone")} required />
+                  <label htmlFor="phone" className="font-bold  py-0 px-0.5">Phone Number</label>
+                  <input id="phone" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none py-2.5 px-3.5 cursor-not-allowed" type="tel" value={billing.phone} onChange={handleField("phone")} readOnly required />
                 </div>
               </div>
 
               <div className="w-full flex flex-col justify-center items-start">
-                <label htmlFor="address" className="font-bold" style={{padding: "0 3px"}}>Delivery Destination</label>
-                <textarea id="address" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Shipping Address" value={billing.address} onChange={handleField("address")} required/>
+                <label htmlFor="address" className="font-bold  py-0 px-0.5">Delivery Destination</label>
+                <textarea id="address" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none py-2.5 px-3.5" placeholder="Shipping Address" value={billing.address} onChange={handleField("address")} required/>
               </div>
 
-              <div className="w-full flex justify-center items-center gap-5">
+              <div className="w-full flex flex-col md:flex-row justify-center items-center gap-5">
                 <div className="w-full flex flex-col justify-center items-start">
-                  <label htmlFor="pincode" className="font-bold" style={{padding: "0 3px"}}>Pincode</label>
-                  <input id="pincode" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} type="text" inputMode="numeric" maxLength="6" pattern="[0-9]{6}" value={billing.pincode} onChange={handlePincodeChange} required />
+                  <label htmlFor="pincode" className="font-bold py-0 px-0.5">Pincode</label>
+                  <input id="pincode" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none py-2.5 px-3.5" type="text" inputMode="numeric" maxLength="6" pattern="[0-9]{6}" value={billing.pincode} onChange={handlePincodeChange} required />
                 </div>
 
                 <div className="w-full flex flex-col justify-center items-start">
-                  <label htmlFor="location" className="font-bold" style={{padding: "0 3px"}}>District</label>
-                  <input id="location" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none cursor-not-allowed" style={{padding: "10px 14px"}} type="text" value={billing.location} readOnly onChange={handleField("location")} required />
-                </div>
-              </div>
-
-              <div className="flex justify-between gap-5 w-full h-[120px]">
-                <div className="w-full flex flex-col justify-center items-start">
-                  <label htmlFor="special_ins" className="font-bold" style={{padding: "0 3px"}}>Speical Instructions</label>
-                  <textarea id="special_ins" className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Special Instructions, LandMarks" value={billing.special_instructions} onChange={handleField("special_instructions")} />
-                </div>
-
-                <div className="w-full flex flex-col justify-center items-start">
-                  <label htmlFor="agent_notes" className="font-bold" style={{padding: "0 3px"}}>Agent Notes</label>
-                  <textarea id="agent_notes" className="w-full h-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none" style={{padding: "10px 14px"}} placeholder="Agent Notes" value={billing.agent_notes} onChange={handleField("agent_notes")} />
+                  <label htmlFor="location" className="font-bold py-0 px-0.5">District</label>
+                  <input id="location" className="w-full text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none cursor-not-allowed py-2.5 px-3.5" type="text" value={billing.location} readOnly onChange={handleField("location")} required />
                 </div>
               </div>
 
-              <div className="flex justify-center gap-5" style={{marginTop: "10px"}}>
-                <button className="text-[1rem] text-white font-bold border-0 rounded-lg cursor-pointer bg-[#28a745] transition duation-300 focus:border-[#28a745] focus:outline-none hover:bg-[#218838] disabled:bg-[#ccc] disabled:text-[#666] disabled:cursor-not-allowed disabled:opacity-[0.6]transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)" style={{fontFamily: "'Segoe UI', sans-serif", padding: "10px 20px"}} type="button" onClick={() => setStep("cart")}> Back to Cart</button>
-                <button className="text-[1rem] text-white font-bold border-0 rounded-lg cursor-pointer bg-[#28a745] transition duation-300 focus:border-[#28a745] focus:outline-none hover:bg-[#218838] disabled:bg-[#ccc] disabled:text-[#666] disabled:cursor-not-allowed disabled:opacity-[0.6]transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)" style={{fontFamily: "'Segoe UI', sans-serif", padding: "10px 20px"}} type="submit" disabled={cart.length === 0}>Place Order</button>
+              <div className="flex flex-col md:flex-row justify-between gap-5 w-full">
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="special_ins" className="font-bold py-0">Speical Instructions</label>
+                  <textarea id="special_ins" className="w-full h-[120px] text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none py-2.5 px-3.5" placeholder="Special Instructions, LandMarks" value={billing.special_instructions} onChange={handleField("special_instructions")} />
+                </div>
+
+                <div className="w-full flex flex-col justify-center items-start">
+                  <label htmlFor="agent_notes" className="font-bold py-0 px-0.5">Agent Notes</label>
+                  <textarea id="agent_notes" className="w-full h-[120px] text-[1rem] border border-[#ccc] rounded-lg transition duration-300 focus:border-[#3cbf4e] focus:outline-none py-2.5 px-3.5" placeholder="Agent Notes" value={billing.agent_notes} onChange={handleField("agent_notes")} />
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-5 mt-2.5">
+                <button className="text-[1rem] text-white font-bold border-0 rounded-lg cursor-pointer bg-[#28a745] transition duation-300 focus:border-[#28a745] focus:outline-none hover:bg-[#218838] disabled:bg-[#ccc] disabled:text-[#666] disabled:cursor-not-allowed disabled:opacity-[0.6]transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15) py-2.5 px-5" style={{fontFamily: "'Segoe UI', sans-serif"}} type="button" onClick={() => setStep("cart")}> Back to Cart</button>
+                <button className="text-[1rem] text-white font-bold border-0 rounded-lg cursor-pointer bg-[#28a745] transition duation-300 focus:border-[#28a745] focus:outline-none hover:bg-[#218838] disabled:bg-[#ccc] disabled:text-[#666] disabled:cursor-not-allowed disabled:opacity-[0.6]transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15) py-2.5 px-5" style={{fontFamily: "'Segoe UI', sans-serif"}} type="submit" disabled={cart.length === 0}>Place Order</button>
               </div>
             </form>
           </div>
         </section>
       )}
-    <Footer /></>
+    <Footer />
+  </div>
   );
 };
 

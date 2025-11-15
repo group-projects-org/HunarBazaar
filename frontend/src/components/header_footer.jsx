@@ -36,7 +36,6 @@ const Header = ( {userType}) => {
         localStorage.removeItem("username");
         localStorage.removeItem("cart");
         setDropdownVisible(false);
-        navigate('/');
       } else {
         console.error('Logout failed');
         setError("Failed to Logout");
@@ -44,7 +43,7 @@ const Header = ( {userType}) => {
     } catch (error) {
       console.error('Error during logout:', error);
       setError("Error during Logout");
-    } finally { setError(null); }
+    } finally { setError(null); navigate('/');}
   };
 
   useEffect(() => {
@@ -71,8 +70,8 @@ const Header = ( {userType}) => {
           <h1 className="text-[1rem] md:text-[1.6rem] font-bold text-black" style={{ fontFamily: "Eagle Lake, cursive" }}>हुनरBazaar</h1>
         </div>
 
-        <div className="hidden sm:block absolute left-1/2 transform -translate-x-1/2">
-          <small className="text-[14px] text-black font-light leading-[1.2] tracking-[1px] uppercase text-center whitespace-nowrap" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }} > "Skill in every hand, Market at every doorstep" </small>
+        <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
+          <small className="text-[14px] text-black font-light leading-[1.2] tracking-[1px] uppercase text-center whitespace-nowrap" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }} > "Craftsmanship you can feel, Luxury you can wear" </small>
         </div>
 
         <div ref={dropdownRef} className="flex items-center gap-4 text-black relative cursor-pointer" style={{marginRight: "15px"}} onClick={() => setDropdownVisible(!dropdownVisible)} >
@@ -109,9 +108,12 @@ const Navbar = ({ tabs }) => {
   }, [windowWidth]);
   return (
     <nav className="flex flex-col md:flex-row justify-center md:items-center gap-0 md:gap-5 bg-[#444] shadow-[0_4px_6px_rgba(0,0,0,0.1)]" style={{ padding: windowWidth >= 768 ? "10px" : "5px" }}>
-      <button onClick={() => setNavVisible((prev) => !prev)} className="md:hidden rounded-[50%] border border-[#3cbf4e] text-[#97c09c] text-[10px] w-5 h-5" style={{marginBottom:"2px", padding:"0"}}> ☰ </button>
+      <div className='flex gap-2 justify-center items-center'>
+        <button onClick={() => setNavVisible((prev) => !prev)} className="md:hidden rounded-[50%] border border-[#3cbf4e] text-white text-[10px] w-5 h-5" style={{marginBottom:"2px", padding:"0"}}> ☰ </button>
+        <small className="md:hidden text-[10px] text-white uppercase text-center whitespace-nowrap" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }} > "Skill in every hand, Market at every doorstep" </small>
+      </div>
       {(navVisible || windowWidth >= 768) && (
-        <div className="flex flex-col md:flex-row gap-3">{tabs.map(([href, Icon, label]) => (<NavLink key={label} href={href} icon={Icon} label={label} />))}</div>
+        <div className="flex flex-col md:flex-row gap-0 md:gap-5">{tabs.map(([href, Icon, label]) => (<NavLink key={label} href={href} icon={Icon} label={label} />))}</div>
       )}
     </nav>
   );
@@ -155,18 +157,18 @@ const Footer = () => {
           <p className="text-[0.8rem] md:text-[1rem] text-[#666666] block w-[90%] leading-relaxed" style={{margin: "2px auto auto auto", fontFamily: "'Segoe UI', sans-serif"}}>Check out our latest offers on clothing and apparel! <b>NEW ARRIVALS and SPECIAL COMBO OFFERS</b> designed just for you !!!</p>
         </div>
         <div className="flex-1 flex flex-col text-center">
-          <h3 className='text-[1rem] md:text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Subscribe to Our Newsletter</h3>
+          <h3 className='text-[1rem] md:text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "10px"}}>Subscribe to Our Newsletter</h3>
           <form onSubmit={handleSubscription}>
-            <input type="email" defaultValue={userEmail} className="text-[0.8rem] md:text-[1rem] text-[#666666] block w-[80%] rounded-[5px] border border-[#bcb9b9]" style={{margin: "auto auto 14px auto", padding: "10px"}} required />
-            <button type="submit" className={`${subscribed ? "bg-red-500 hover:bg-red-600" : "bg-[#3cbf4e] hover:bg-[#45a049]"} text-white border-0 rounded-[5px] cursor-pointer text-[0.8rem] md:text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)]`} style={{padding: "8px 12px"}}>{subscribed? "Cancel" : "Subscribe"}</button>
+            <input type="email" defaultValue={userEmail} className="text-[0.8rem] md:text-[1rem] text-[#666666] block w-[80%] rounded-[5px] border border-[#bcb9b9] cursor-not-allowed" style={{margin: "auto auto 14px auto", padding: "10px"}} readOnly required />
+            <button type="submit" className={`${subscribed ? "bg-red-500 hover:bg-red-600" : "bg-[#3cbf4e] hover:bg-[#45a049]"} text-white border-0 rounded-[5px] cursor-pointer text-[0.8rem] md:text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] py-2 px-3`}>{subscribed? "Cancel" : "Subscribe"}</button>
           </form>
         </div>
         <div className="flex-1 flex flex-col text-center">
           <h3 className='text-[1rem] md:text-[1.2rem] text-[#333] font-bold' style={{fontFamily: "Merriweather, Cambria, serif", marginBottom: "15px"}}>Connect With Developer</h3>
           {links.map(([name, url, icon], idx)=> {
           return (
-            <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="text-[#45a049] hover:text-black transition-colors duration-300 no-underline text-[0.9rem] flex items-center justify-start wrap-break-all " style={{marginBottom: "7px", paddingLeft: "20%", fontFamily: "Poppins, sans-serif"}} >
-              <img className="w-[25px] h-[25px]" style={{margin: "0px 8px"}}src={icon} alt={name} /> {name} 
+            <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="text-[#45a049] hover:text-black transition-colors duration-300 no-underline text-[0.7rem] md:text-[0.9rem] flex items-center justify-start wrap-break-all " style={{marginBottom: "7px", paddingLeft: "20%", fontFamily: "Poppins, sans-serif"}} >
+              <img className="w-[15px] h-[15px] md:w-[25px] md:h-[25px]" style={{margin: "0px 8px"}}src={icon} alt={name} /> {name} 
             </a>
           );
         })}

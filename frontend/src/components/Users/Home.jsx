@@ -49,13 +49,15 @@ const Home = () => {
       <Header />
       <div className="relative max-w-full" style={{marginBottom: "-20%"}}>
         {slides.current.map((num, index) => (
-          <div key={num} style={{ display: currentSlide === index ? "block" : "none" }}> <img className= "w-full h-auto"src={`/assets/Discounts/Discount${num}.jpeg`} alt={`Slide ${num}`} /> </div>
+          <div key={num} style={{ display: currentSlide === index ? "block" : "none" }}> 
+            <img className= "object-cover w-full h-auto"src={`/assets/Discounts/Discount${num}.jpeg`} alt={`Slide ${num}`} /> 
+          </div>
         ))}
-        <button className="h-[50%] top-0 cursor-pointer absolute left-[0.5px] text-black font-bold text-[30px] bg-transparent border-0 shadow-none active:border-2 active:border-black active:shadow-[0_0_0_1.5px_#ddd] hover:bg-white/10 hover:backdrop-blur-sm transition-all duration-300" style={{padding: "10px 15px"}} onClick={handlePrev}> &#10094; </button>
-        <button className="h-[50%] top-0 cursor-pointer absolute right-[0.5px] text-black font-bold text-[30px] bg-transparent border-0 shadow-none active:border-2 active:border-black active:shadow-[0_0_0_1.5px_#ddd] hover:bg-white/10 hover:backdrop-blur-sm transition-all duration-300" style={{padding: "10px 15px"}}onClick={handleNext}> &#10095; </button>
+        <button className="h-[50%] top-0 cursor-pointer absolute left-[0.5px] text-black font-bold text-[15px] md:text-[30px] bg-transparent border-0 shadow-none active:border-2 active:border-black active:shadow-[0_0_0_1.5px_#ddd] hover:bg-white/10 hover:backdrop-blur-sm transition-all duration-300" style={{padding: "10px 15px"}} onClick={handlePrev}> &#10094; </button>
+        <button className="h-[50%] top-0 cursor-pointer absolute right-[0.5px] text-black font-bold text-[15px] md:text-[30px] bg-transparent border-0 shadow-none active:border-2 active:border-black active:shadow-[0_0_0_1.5px_#ddd] hover:bg-white/10 hover:backdrop-blur-sm transition-all duration-300" style={{padding: "10px 15px"}}onClick={handleNext}> &#10095; </button>
       </div>
 
-      <MarqueeCard announcements={["🎉 Mega Festive Sale — Up to 70% OFF on all categories!", "🚚 Free Delivery on Orders Above ₹499!", "🔥 Flash Deal: Buy 2 Get 1 FREE on Select Items!", "🕒 Hurry! Limited-Time Offers Ending Soon!", "🎁 Exclusive Combo Offers Available Today!", "🌟 New Arrivals — Fresh Styles Just Dropped!", "🛍️ Flat ₹200 OFF on Your First Purchase!", "💥 Clearance Sale — Grab Before It’s Gone!", "✨ Join Trendify Plus & Get Early Access to Big Sales!"]} />
+      <MarqueeCard announcements={["✨ Handcrafted elegance for the modern India.", "🧵 Finest artisan-made pieces, newly curated.", "🌙 Subtle luxury. Infinite craftsmanship.", "💛 Discover wearable art, handcrafted with soul.", "🏵️ Luxury that celebrates Indian artisans.", "🌟 New handcrafted selections added today.", "🎨 Experience the beauty of slow, mindful fashion.", "🌿 Sustainably crafted. Timelessly designed.", "🧶 Every creation is a story stitched by hand.","✨ Where craftsmanship becomes luxury."]} />
 
       <div className="relative border-0 bg-transparent shadow-none w-full text-center rounded-lg" style={{ padding: '10px 20px' }}>
         <h1 className="font-bold text-xl md:text-2xl" style={{fontFamily: "Merriweather, Cambria, serif"}}>Our Categories</h1>

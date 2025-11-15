@@ -66,10 +66,10 @@ const ProductModal = ({ show, onClose, newProduct, setNewProduct, onSave, catego
   };
 
   return (
-    <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-1000" style={{padding: "16px"}}>
-      <div className="bg-white rounded-lg shadow-[0_25px_50px_-12px_rgba(0,0,0,0,25)] max-w-5xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden" style={{ padding: '24px 34px' }}>
+    <div className="fixed w-screen md:w-auto inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-1000 p-4">
+      <div className="bg-white rounded-lg shadow-[0_25px_50px_-12px_rgba(0,0,0,0,25)] max-w-5xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden py-6 px-8.5">
 
-        <div className="flex justify-between items-center" style={{marginBottom: "24px"}}>
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl text-gray-900 mb-2" style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>{isEditing ? 'Edit Product' : 'Add New Product'}</h1>
           <button onClick={onClose} className="border border-[#D1D5DB] rounded-lg bg-white text-[#374151] cursor-pointer text-3.5"><X style={{ height: '24px', width: '24px' }} /></button>
         </div>
@@ -80,12 +80,11 @@ const ProductModal = ({ show, onClose, newProduct, setNewProduct, onSave, catego
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col">
-                <label className="text-4.5 font-medium text-[#374151]" style={{ padding: "0 0 2px 2px"}}>Product Name*</label>
-                <input type="text" value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none" style={{padding: "8px 12px"}} placeholder="Enter product name" />
+                <label className="text-4.5 font-medium text-[#374151] pt-0 pr-0 pl-0.5 pb-0.5">Product Name*</label>
+                <input type="text" value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none py-2 px-3" placeholder="Enter product name" />
               </div>
-
               <div className="flex flex-col">
-                <label className="text-4.5 font-medium text-[#374151]" style={{ padding: "0 0 2px 2px"}}>Category*</label>
+                <label className="text-4.5 font-medium text-[#374151] pt-0 pr-0 pl-0.5 pb-0.5">Category*</label>
                 <select value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value, subcategory: ''})} className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none bg-white" style={{padding: "10px 12px"}}>
                   <option value="">Select Category</option>{Object.values(categories).map(cat => (<option key={cat} value={cat}>{cat}</option>))}
                 </select>
@@ -121,10 +120,9 @@ const ProductModal = ({ show, onClose, newProduct, setNewProduct, onSave, catego
 
             <div className="flex flex-col space-y-3">
               <label className="text-4.5 font-medium text-[#374151] pl-1"> Product Image URLs </label>
-
               <div className="flex gap-3 w-full" style={{margin: "5px 0 10px 0"}} >
-                <input type="text" value={newImageURL} onChange={(e) => setNewImageURL(e.target.value)} placeholder="Paste image URL (Cloudinary, etc.)" className="border border-[#D1D5DB] rounded-lg text-sm outline-none flex-1 focus:border-green-400 transition-[border-color] duration-200"  style={{padding: "5px 10px"}}/>
-                <button type="button" onClick={handleAddImageLink} className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all duration-300 hover:scale-105" style={{padding: "5px 8px"}} disabled={newProduct.images?.length + newProduct.image_links?.length >= 5}> <PlusCircle size={18} /> Add </button>
+                <input type="text" value={newImageURL} onChange={(e) => setNewImageURL(e.target.value)} placeholder="Paste image URL (Cloudinary, etc.)" className="border border-[#D1D5DB] rounded-lg text-sm outline-none flex-1 focus:border-green-400 transition-[border-color] duration-200 py-[5px] px-2.5" />
+                <button type="button" onClick={handleAddImageLink} className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all duration-300 hover:scale-105 py-[5px] px-2" disabled={newProduct.images?.length + newProduct.image_links?.length >= 5}> <PlusCircle size={18} /> Add </button>
               </div>
 
               {newProduct.images?.length + newProduct.image_links?.length >= 5&& (<p style={{ color: "red", fontSize: "12px" }}> Maximum Image Uploads Reached</p>)}
@@ -142,79 +140,66 @@ const ProductModal = ({ show, onClose, newProduct, setNewProduct, onSave, catego
             </div>
           </div>
           
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             
             <div className="flex flex-col">
-              <label className="text-4.5 font-medium text-[#374151]" style={{ padding: "0 0 2px 2px"}}>Price (₹)*</label>
-              <input type="number" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none" style={{padding: "8px 12px"}} placeholder="0.00" min="0" step="0.01"/>
+              <label className="text-4.5 font-medium text-[#374151] pt-0 pr-0 pb-0.5 pl-0.5">Price (₹)*</label>
+              <input type="number" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none px-3 py-2" placeholder="0.00" min="0" step="0.01"/>
             </div>
 
-            <div className="flex flex-col gap-4">
-
-              <label className="text-4.5 font-medium text-[#374151]" style={{ padding: "0 0 2px 2px"}}>Size</label>
-              <div className="flex gap-6" style={{ marginBottom: '16px' }}>
-                {['Free Size', 'S', 'M', 'L', 'XL'].map(size => (
-                  <div key={size} onClick={() => setSelectedSize(size)} className="h-10 w-auto rounded-lg font-bold cursor-pointer" style={{ backgroundColor: selectedSize === size ? '#4caf50' : '#ddd', color: selectedSize === size ? '#fff' : '#333', padding: "5px 10px"}} > {size} </div>
+            <div className="flex flex-col">
+              <label className="text-4.5 font-medium text-[#374151] pt-0 pr-0 pb-0.5 pl-0.5">Size*</label>
+              {(() => {
+                const isFreeSizeCategory = ["Accessories", "Footwear"].includes(newProduct?.category);
+                const sizes = isFreeSizeCategory? ["Free Size"] : ["XS", "S", "M", "L", "XL"];
+                return (<div className="flex gap-3">
+                {sizes.map(size => (
+                  <div key={size} onClick={() => setSelectedSize(size)} className="min-w-10 w-auto rounded-lg font-bold cursor-pointer py-[5px] px-2.5 text-center" style={{backgroundColor: selectedSize === size ? "#4caf50" : "#ddd", color: selectedSize === size ? "#fff" : "#333"}}>{size}</div>
                 ))}
-              </div>
-
-              <div className="flex flex-col gap-4">
-              <label className="text-4.5 font-medium text-[#374151]" style={{ padding: "0 0 2px 2px"}}>Colours Available*</label>
-              <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                <input
-                  type="text"
-                  value={newColor}
-                  onChange={(e) => setNewColor(e.target.value)}
-                  placeholder="Color"
-                  className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none" style={{padding: "8px 12px", flex: 1 }}
-                />
+                </div>);
+              })()}
+            </div>
+            
+            <div className="flex flex-col md:flex-row md:gap-2 justify-between md:items-center">
+              <div className="flex gap-2">
+                <div className="flex flex-col">
+                  <label className="text-4.5 font-medium text-[#374151] pt-0 pr-0 pb-0.5 pl-0.5">Colours Available*</label>
+                  <div className="flex gap-3 mb-3">
+                    <input type="text" value={newColor} onChange={(e) => setNewColor(e.target.value)} placeholder="Color" className="py-2 px-3 border border-[#D1D5DB] rounded-lg text-3.5 outline-none" />
+                  </div>
                 </div>
-                
-              <div className="flex flex-col gap-4">
-                <label className="text-4.5 font-medium text-[#374151]" style={{ padding: "0 0 2px 2px"}}>Stock*</label>
-                <input
-                  type="number"
-                  value={newStock}
-                  onChange={(e) => setNewStock(e.target.value)}
-                  placeholder="Stock"
-                  className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none" style={{padding: "8px 12px", width: '120px' }}
-                />
-                <button type="button" onClick={handleAddVariant} className="save-button">
-                  Add
-                </button>
-              </div></div>
-
-              <label className="text-4.5 font-medium text-[#374151]" style={{ padding: "0 0 2px 2px"}}>Current Inventory*</label>
-              <div style={{ marginTop: '10px' }}>
-                {newProduct.variants.map((variant) =>
-                  Object.entries(variant.options).map(([color, stock]) => (
-                    <div key={`${variant.size}-${color}`} style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '8px',
-                      border: '1px solid #ccc',
-                      borderRadius: '6px',
-                      marginBottom: '6px',
-                      background: '#f7f7f7'
-                    }}>
-                      <span><strong>{variant.size}</strong> - {color} : {stock}</span>
-                      <button
-                        onClick={() => handleRemoveVariant(variant.size, color)}
-                        style={{
-                          border: 'none',
-                          background: 'none',
-                          color: 'red',
-                          fontSize: '18px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))
-                )}
+                <div className="flex flex-col">
+                  <label className="text-4.5 font-medium text-[#374151] pt-0 pr-0 pl-0.5 pb-0.5">Stock*</label>
+                  <input type="number" value={newStock} onChange={(e) => setNewStock(e.target.value)} placeholder="Stock" className="border border-[#D1D5DB] rounded-lg text-3.5 outline-none w-30 py-2 px-3 mb-3"/>
+                </div>
               </div>
+
+              <button className="bg-[#3cbf4e] h-10 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 hover:bg-[#45a049] py-2.5 px-4 font-bold mt-2.5" onClick={handleAddVariant}>Add Varient</button>
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-4.5 font-medium text-[#374151] pt-0 pr-0 pl-0.5 pb-0.5">Current Inventory*</label>
+              <table className="min-w-full border-collapse border border-gray-300 text-center mt-3">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border p-2">Size</th>
+                    <th className="border p-2">Color</th>
+                    <th className="border p-2">Stock</th>
+                    <th className="border p-2">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {newProduct.variants.map((variant) =>
+                    Object.entries(variant.options).map(([color, stock]) => (
+                      <tr key={`${variant.size}-${color}`} className="bg-[#f7f7f7]">
+                        <td className="border p-2">{variant.size}</td>
+                        <td className="border p-2">{color}</td>
+                        <td className="border p-2">{stock}</td>
+                        <td className="border p-2"><button onClick={() => handleRemoveVariant(variant.size, color)} className="text-red text-xl cursor-pointer bg-none border-0">✕</button></td>
+                      </tr>
+                  )))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

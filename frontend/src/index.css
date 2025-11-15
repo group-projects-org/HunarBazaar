@@ -12,8 +12,6 @@
 @import "tailwindcss";
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
 }
@@ -81,4 +79,24 @@ body {
     opacity: 1;
     transform: translate(-50%, -50%);
   }
+}
+
+/*--------------TRANSPARENT TOOLBAR--------------*/
+
+.transparent-scrollbar {
+  cursor: grab; 
+  -ms-overflow-style: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.2) transparent;
+} .transparent-scrollbar:active { 
+  cursor: grabbing; 
+} .transparent-scrollbar::-webkit-scrollbar { 
+  height: 6px;
+} .transparent-scrollbar::-webkit-scrollbar-track { 
+  background: transparent; 
+} .transparent-scrollbar::-webkit-scrollbar-thumb { 
+  background: rgba(0,0,0,0.18); 
+  border-radius: 4px; 
+} .transparent-scrollbar::-webkit-scrollbar-thumb:hover { 
+  background: rgba(0,0,0,0.28); 
 }

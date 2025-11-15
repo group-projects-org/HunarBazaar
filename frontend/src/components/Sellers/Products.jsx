@@ -3,26 +3,13 @@ import ProductModal from './ProductModal';
 import { ProductCard } from './../Cards';
 import { Header, Footer } from '../header_footer';
 import axios from 'axios';
-
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const ProductsListed = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    category: '',
-    price: 0,
-    description: '',
-    variants: [
-      { size: 'S', options: {} },
-      { size: 'M', options: {} },
-      { size: 'L', options: {} },
-      { size: 'XL', options: {} }
-    ],
-    images: []
-  });
+  const [newProduct, setNewProduct] = useState({name: '', category: '', price: 0, description: '', variants: [], images: [], image_links: [] });
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -37,23 +24,11 @@ const ProductsListed = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        let response = await axios.get(`${BASE_URL}/api/seller_products_list`, {
-          withCredentials: true
-        });
-
-        // ✅ New backend returns flat array of products directly
+        let response = await axios.get(`${BASE_URL}/api/seller_products_list`, {withCredentials: true });
         let fetchedProducts = [];
         if (response.data.products && response.data.products.length > 0) {
-          fetchedProducts = response.data.products.map(p => ({
-            id: p.id || p.product_id,
-            name: p.name,
-            category: p.category,
-            price: p.price,
-            image: p.image || (p.images && p.images.length > 0 ? p.images[0] : null)
-          }));
+          fetchedProducts = response.data.products.map(p => ({id: p.id || p.product_id, name: p.name, category: p.category, price: p.price, image: p.image || (p.images && p.images.length > 0 ? p.images[0] : null)}));
         }
-
-
         setProducts(fetchedProducts);
         const uniqueCategories = [...new Set(fetchedProducts.map(p => p.category))];
         setSellerCategories(['All Categories', ...uniqueCategories]);
@@ -71,12 +46,9 @@ const ProductsListed = () => {
         setError(error.message);
         setLoading(false);
       }
-    };
-
-    fetchProducts();
+    }; fetchProducts();
   }, []);
 
-  // ✅ Filtering logic
   useEffect(() => {
     const filterProducts = (search, category) => {
       return products.filter(product => {
@@ -84,200 +56,91 @@ const ProductsListed = () => {
         const matchesSearch = product.name?.toLowerCase().includes(search.toLowerCase());
         return matchesCategory && matchesSearch;
       });
-    };
-    const filtered = filterProducts(searchInput, selectedCategory);
+    }; const filtered = filterProducts(searchInput, selectedCategory);
     setFilteredProducts(filtered);
     setCurrentPage(1);
   }, [searchInput, selectedCategory, products]);
 
-  // ✅ Paginated results
   const paginatedProducts = useMemo(() =>
     filteredProducts.slice((currentPage - 1) * productsPerLoad, currentPage * productsPerLoad),
     [filteredProducts, currentPage]
   );
 
-  // ✅ Handle new product save
   const handleSaveProduct = async (e) => {
-  e.preventDefault();
-
-  try {
-    const formData = new FormData();
-
-    // 🔹 Basic fields
-    formData.append('name', newProduct.name.trim());
-    formData.append('price', newProduct.price);
-    formData.append('category', newProduct.category);
-    formData.append('description', newProduct.description);
-
-    // 🔹 Variants as JSON
-    formData.append('variants', JSON.stringify(newProduct.variants));
-
-    // 🔹 Append multiple image URLs individually (array of URLs)
-    if (newProduct.image_links && newProduct.image_links.length > 0) {
-      newProduct.image_links.forEach((url) => {
-        if (url && url.trim() !== "") {
-          formData.append('image_links[]', url.trim());
-        }
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('name', newProduct.name.trim());
+      formData.append('price', newProduct.price);
+      formData.append('category', newProduct.category);
+      formData.append('description', newProduct.description);
+      formData.append('variants', JSON.stringify(newProduct.variants));
+      console.log(newProduct.image_links);
+      if (newProduct.image_links && newProduct.image_links.length > 0) {
+        newProduct.image_links.forEach((url) => {
+          if (url && url.trim() !== "") { formData.append('image_links', url.trim()); }
+        });
+      } if (newProduct.images && newProduct.images.length > 0) {
+        newProduct.images.forEach((file) => {formData.append('images', file);});
+      }
+      const response = await axios.post(`${BASE_URL}/api/add_product`, formData, {
+        withCredentials: true,
+        headers: {'Content-Type': 'multipart/form-data',},
       });
+
+      if (response.status === 200 || response.status === 201){
+        alert('✅ Product saved successfully!');
+        setShowModal(false);
+        setNewProduct({name: '', price: '', category: '', description: '', variants: [], images: [], image_links: [] });
+      } else {alert('❌ Failed to save product. Try again.');}
+    } catch (err) {
+      console.error('Error saving product:', err);
+      alert('⚠️ Error while saving product');
     }
-
-    // 🔹 Append uploaded image files
-    if (newProduct.images && newProduct.images.length > 0) {
-      newProduct.images.forEach((file) => {
-        formData.append('images', file);
-      });
-    }
-
-    // ✅ API call
-    const response = await axios.post(`${BASE_URL}/api/add_product`, formData, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    // ✅ Handle response
-    if (response.status === 200 || response.status === 201) {
-      alert('✅ Product saved successfully!');
-      setShowModal(false);
-
-      // Reset product form cleanly
-      setNewProduct({
-        name: '',
-        price: '',
-        category: '',
-        description: '',
-        variants: [],
-        images: [],
-        image_links: [],
-      });
-    } else {
-      alert('❌ Failed to save product. Try again.');
-    }
-  } catch (err) {
-    console.error('Error saving product:', err);
-    alert('⚠️ Error while saving product');
-  }
-};
-
-
-  // ✅ Handle size toggle inside modal
-  const handleSizeToggle = (size) => {
-    const updatedVariants = newProduct.variants.map(v =>
-      v.size === size ? { ...v, selected: !v.selected } : v
-    );
-    setNewProduct({ ...newProduct, variants: updatedVariants });
   };
 
   return (
-    <>
-      {loading && (
-        <>
+    <div className='relative h-full w-full overflow-hidden'>
+      {loading && (<>
           <div className="toast-overlay" />
           <div className="toast-message processing">Loading the Data...</div>
-        </>
-      )}
-      {error && (
-        <>
-          <div className="toast-overlay" onClick={() => setError(null)} />
-          <div className="toast-message error" onClick={() => setError(null)}>
-            {error}
-          </div>
-        </>
-      )}
+      </>)}
+      {error && (<>
+        <div className="toast-overlay" onClick={() => setError(null)} />
+        <div className="toast-message error" onClick={() => setError(null)}>{error}</div>
+      </>)}
 
       <Header userType={"sellers"}/>
-
-      <div className="flex items-center justify-center gap-2.5 bg-[#f2f2f2] rounded-lg"
-        style={{ margin: "20px 0", padding: "10px" }}>
-        <input
-          className="w-[250px] text-[1rem] border-[#ddd] border-2 rounded-[5px]"
-          style={{ padding: "10px" }}
-          type="text"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Search products..."
-        />
-        <select
-          className="w-[150px] text-[1rem] border-2 border-[#ddd] rounded-[5px]"
-          style={{ padding: "10px" }}
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {sellerCategories.map((cat, idx) => (
-            <option key={idx} value={cat}>{cat}</option>
-          ))}
-        </select>
-        <button
-          className="bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 hover:bg-[#45a049]"
-          style={{ padding: "10px 15px" }}
-          onClick={() => setShowModal(true)}
-        >
-          Add Product
-        </button>
+      <div className="flex flex-col md:flex-row items-center justify-center gap-2.5 bg-[#f2f2f2] rounded-lg my-5 mx-0 p-2.5">
+        <input className="w-[250px] text-[1rem] border-[#ddd] border-2 rounded-[5px] p-2.5" type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search products..."/>
+        <div className='flex gap-2.5'>
+          <select className="w-[150px] text-[1rem] border-2 border-[#ddd] rounded-[5px] p-2.5" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+            {sellerCategories.map((cat, idx) => ( <option key={idx} value={cat}>{cat}</option> ))}
+          </select>
+          <button className="bg-[#3cbf4e] h-11 text-white border-0 rounded-[5px] cursor-pointer text-[1rem] transition-colors duration-300 hover:bg-[#45a049] py-2.5 px-4 font-bold" onClick={() => setShowModal(true)}> Add Product </button>
+        </div>
       </div>
 
-      {showModal && (
-        <ProductModal
-          show={true}
-          onClose={() => setShowModal(false)}
-          newProduct={newProduct}
-          setNewProduct={setNewProduct}
-          onSave={handleSaveProduct}
-          categories={categories}
-          sizes={['S', 'M', 'L', 'XL']}
-          handleSizeToggle={handleSizeToggle}
-        />
-      )}
+      {showModal && (<ProductModal show={true} onClose={() => setShowModal(false)} newProduct={newProduct} setNewProduct={setNewProduct} onSave={handleSaveProduct} categories={categories} isEditing={false}/>)}
 
-      <div
-        className="block w-full max-w-[1200px] text-center bg-[#f4f4f4] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
-        style={{ margin: "40px auto", padding: "10px 20px" }}
-      >
-        <h1 className="font-bold text-2xl" style={{ fontFamily: "Merriweather, Cambria, serif", margin: "10px" }}>
-          Our Products
-        </h1>
+      <div className="block w-full max-w-[1200px] text-center bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] md:my-10 mx-auto py-2.5 px-5">
+        <h1 className="font-bold text-2xl" style={{ fontFamily: "Merriweather, Cambria, serif", margin: "10px" }}> Our Products </h1>
 
         <div className="flex flex-wrap justify-center gap-[15px] w-full box-border" style={{ padding: "20px" }}>
           {paginatedProducts.length > 0 ? (
-            paginatedProducts.map(product => (
-              <ProductCard product={product} key={product.id} user_type={"sellers"}/>
-            ))
-          ) : (
-            <p>No products found.</p>
-          )}
+            paginatedProducts.map(product => ( <ProductCard product={product} key={product.id} user_type={"sellers"}/>))
+          ) : ( <div className="text-gray-500 italic mb-4 text-sm"> Your cart is empty... </div>)}
         </div>
 
         <div>
-          {currentPage > 1 && (
-            <button
-              className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem]"
-              style={{ padding: "8px 12px", margin: "5px" }}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              &#10094;
-            </button>
-          )}
-          <button
-            className="bg-[#3cbf4e] text-white border-0 rounded-[5px] cursor-pointer text-[1rem] hover:bg-[#45a049]"
-            style={{ padding: "10px 15px" }}
-          >
-            {currentPage}
-          </button>
-          {currentPage * productsPerLoad < filteredProducts.length && (
-            <button
-              className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem]"
-              style={{ padding: "8px 12px", margin: "5px" }}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              &#10095;
-            </button>
-          )}
+          {currentPage > 1 && ( <button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] py-2 px-3 m-[5px]" onClick={() => setCurrentPage(currentPage - 1)}> &#10094; </button>)}
+          <button className="bg-[#3cbf4e] text-white border-0 rounded-[5px] cursor-pointer text-[1rem] hover:bg-[#45a049] py-2.5 px-4"> {currentPage} </button>
+          {currentPage * productsPerLoad < filteredProducts.length && (<button className="bg-[#ccc] border-[#ddd] border cursor-pointer hover:bg-[#ddd] font-bold rounded-[5px] text-[1rem] py-2 px-3 m-[5px]" onClick={() => setCurrentPage(currentPage + 1)}> &#10095;</button>)}
         </div>
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 };
 

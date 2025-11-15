@@ -10,18 +10,6 @@ const Orders = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const getDeliveryStatus = (data) => {
-    if (!data?.order_date || !data?.delivery_date) return "Unknown";
-    const orderDate = new Date(data.order_date);
-    const deliveryDate = new Date(data.delivery_date);
-    const currentDate = new Date();
-    if (currentDate > deliveryDate) return "Delivered";
-    const totalDuration = deliveryDate - orderDate;
-    const timeLeft = deliveryDate - currentDate;
-    if (timeLeft <= totalDuration / 3) return "Out for Delivery";
-    return "Shipping";
-  };
-
   useEffect(() => {
     const abort = new AbortController();
     const fetchData = async () => {
@@ -32,7 +20,6 @@ const Orders = () => {
           withCredentials: true,
           signal: abort.signal,
         }); setResult(res.data.orderDetails);
-        console.log(res.data.orderDetails);
       } catch (err) {
         if (err.name !== "CanceledError" && err.name !== "AbortError") setError(err.response?.data?.detail || err.message);
       } finally {setLoading(false);}
@@ -40,7 +27,8 @@ const Orders = () => {
     return () => abort.abort();
   }, []);  
 
-  return (<>
+  return (
+    <div className='relative h-full w-full overflow-hidden'>
       {loading && (<>
         <div className="toast-overlay" />
         <div className="toast-message processing">Loading the Data...</div>
@@ -49,35 +37,42 @@ const Orders = () => {
         <div className="toast-message error" onClick={() => { setError(null); }}>{error}</div>
       </>)}
       <Header />
-      <main className="block w-full max-w-[1200px] text-center bg-[#fefafa] rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.1)]" style={{margin: "40px auto", padding: "30px 30px"}}>
-        {result.map((order, idx) => (
-          <div key={idx} className="w-full bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow text-left" style={{padding:"20px", marginBottom:"20px"}}>
+      <main className="block w-full max-w-[1200px] text-center bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] my-0 sm:my-10 sm:mx-auto p-7.5">
+        <h1 className="font-bold text-2xl mt-0 mb-5 md:mt-auto" style={{fontFamily: "Merriweather, Cambria, serif"}}>Your Orders</h1>
+        {result?.length > 0? (result.map((order, idx) => (
+          <div key={idx} className="flex flex-col md:flex-row w-full bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md justify-between md:items-center text-left hover:scale-102 transition-all duration-300 pt-5 px-7 mb-5" onClick={() => navigate(`/OrderData?order_id=${encodeURIComponent(order.order_id)}`)}>
             {order.images && order.images.length > 0 ? (
-              <div className="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
+              <div className="flex gap-2 w-full md:max-w-[80%] mb-4 sm:justify-start overflow-x-auto transparent-scrollbar rounded-lg">
                 {order.images.map((val, index) => (
-                  <img key={index} src={val} alt={`Product Image ${index + 1}`} className="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-lg border border-gray-300" />
+                <div key={index} className="shrink-0 m-0 p-0">
+                  <img key={index} src={val} alt={`Product Image ${index + 1}`} className="min-w-28 min-h-28 w-28 h-28 object-cover rounded-lg border border-gray-300" />
+                </div>
                 ))}
               </div>
             ) : ( <div className="text-gray-500 italic mb-4 text-sm"> No product images available </div> )}
-            <div className="flex justify-between items-center text-lg font-medium mb-2">
-              <span className="text-green-600">₹ {order.total_amount}</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${new Date(order.delivery_date) < new Date() ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
-                {new Date(order.delivery_date) < new Date() ? "Delivered" : "In Progress"}
-              </span>
-            </div>
+            <div className="w-full md:w-[23%] md:ml-7 flex flex-col m-0 justify-center items-start">
+              <div className="w-full flex justify-between items-center text-lg font-medium md:mb-3">
+                <span className="text-green-600">₹ {order.total_amount}</span>
+                <span className={`py-1 px-3 rounded-full text-sm font-semibold ${new Date(order.delivery_date) < new Date() ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
+                  {new Date(order.delivery_date) < new Date() ? "Delivered" : "In Progress"}
+                </span>
+              </div>
 
-            <div className="text-gray-600 text-sm">
-              Order Date:{" "}
-              <span className="font-medium"> {new Date(order.order_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"})} </span>
-              <br />
-              Delivery Date:{" "}
-              <span className="font-medium">{new Date(order.delivery_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
-              </span>
+              <div className="text-gray-600 text-sm mb-5 md:mb-0">
+                Order Date:{" "} <span className="font-medium"> {new Date(order.order_date).toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"})} </span>
+                <br />
+                Delivery Date:{" "} <span className="font-medium">{new Date(order.delivery_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                </span>
+            </div>
             </div>
           </div>
-        ))} </main>
+        ))) : (<>
+        <div className="text-gray-500 italic mb-4 text-sm"> Nothing to show in Orders </div>
+        <button className="bg-[#3cbf4e] hover:bg-[#45a049] text-white border-0 rounded-[5px] cursor-pointer text-[0.8rem] md:text-[1rem] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] px-3 py-2" onClick={() => navigate('/Products')}>Start Shopping Now</button>
+        </>)}
+        </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

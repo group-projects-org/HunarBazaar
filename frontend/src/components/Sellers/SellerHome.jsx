@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 
 const Home = () => {
   return (
-    <div>
+    <div className='relative h-full w-full overflow-hidden'>
       <Header userType={"sellers"}/>
       <Outlet />
       <Footer />

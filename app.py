@@ -9,6 +9,7 @@ from backend.routes.OTPs import otp_router
 from backend.routes.product import product_router
 from backend.routes.user import user_data_route
 from backend.routes.seller_products import seller_product_router
+from backend.routes.OrderData import order_data_router
 BASE_URI = os.getenv("BASE_URI")
 
 @asynccontextmanager
@@ -20,6 +21,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="HunarBazar: E-Commerce", lifespan=lifespan)
 app.include_router(order_router, prefix="/api", tags=["Order Management"])
+app.include_router(order_data_router, prefix="/api", tags=["Order Data Send Management"])
 app.include_router(otp_router, prefix="/api", tags=["OTP Management"])
 app.include_router(product_router, prefix="/api", tags=["Product Management"])
 app.include_router(user_route, prefix="/api", tags=["User State Management"])

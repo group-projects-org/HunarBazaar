@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY --from=base /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local /usr/local
+COPY --from=builder /app/dependencies/AES_Implementation/build /app/dependencies/AES_Implementation/build
 
 COPY . .
 RUN ls -lh /usr/local/bin || true

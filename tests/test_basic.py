@@ -14,9 +14,9 @@ def test_root_frontend():
 
 def test_login_success():
     payload = {"username": "Tanuj Bhatt", "password": "anything", "userType": "users"}
-    r = client.post("/user/login", json=payload)
+    r = client.post("/api/login", json=payload)
     assert r.status_code in [200, 401]
 
 def test_verify_token_missing():
-    r = client.get("/user/verify-token")
+    r = client.get("/api/verify-token")
     assert r.status_code == 401

@@ -70,38 +70,20 @@ pipeline {
 
         stage('Run Unit Tests') {
             steps {
-                bat '''
-                docker run --rm %IMAGE_NAME% sh -c "pytest /app/tests --maxfail=1 --disable-warnings -q"
-                '''
-            }
-        }
-
-        stage('Push to DockerHub') {
-            when { branch 'master' }
-            steps {
-                withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKERHUB_PASS')]) {
+                withCredentials([
+                    string(credentialsId: 'MONGO_URI', variable: 'MONGO_URI'),
+                    string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_KEY')
+                ]) {
                     bat '''
-                    echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin
-                    docker tag %IMAGE_NAME% %DOCKERHUB_USER%/%IMAGE_NAME%:latest
-                    docker push %DOCKERHUB_USER%/%IMAGE_NAME%:latest
+                    docker run --rm ^
+                        -e MONGO_URI=%MONGO_URI% ^
+                        -e JWT_SECRET_KEY=%JWT_SECRET_KEY% ^
+                        %IMAGE_NAME% sh -c "pytest /app/tests --maxfail=1 --disable-warnings -q"
                     '''
                 }
             }
         }
 
-        stage('Deploy') {
-            steps {
-                sshagent(['your-ec2-ssh-key']) {
-                    bat '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@your-server-ip ^
-                        "docker pull %DOCKERHUB_USER%/%IMAGE_NAME%:latest && ^
-                        docker stop %CONTAINER_NAME% || true && ^
-                        docker rm %CONTAINER_NAME% || true && ^
-                        docker run -d --name %CONTAINER_NAME% -p 8000:8000 %DOCKERHUB_USER%/%IMAGE_NAME%:latest"
-                    '''
-                }
-            }
-        }
     }
 
     post {

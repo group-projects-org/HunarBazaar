@@ -34,8 +34,8 @@ db = mongo_client[MONGO_DB_NAME]
 # -------------------------
 # JWT Configuration
 # -------------------------
-SECRET_KEY = "khajan_bhatt"
-ALGORITHM = "HS256"
+SECRET_KEY=os.getenv("JWT_SECRET_KEY")
+ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 # -------------------------

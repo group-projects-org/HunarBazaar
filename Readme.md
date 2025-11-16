@@ -118,6 +118,8 @@
       CLOUDINARY_CLOUD_NAME=<Your Cloudinary Account ID>
       CLOUDINARY_API_KEY=<Your Cloudinary API Key>
       CLOUDINARY_API_SECRET=<Your Cloudinary API Secret Password>
+      JWT_SECRET_KEY=<Your JWT Secrt Key>
+      JWT_ALGORITHM=<Your JWT Algorithm Used>
    
    HunarBazaar/frontend/.env:
       REACT_APP_API_BASE_URL=<Your Backend Flask API Link, e.g. http://127.0.0.1:8000>

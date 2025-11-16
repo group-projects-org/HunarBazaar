@@ -71,7 +71,7 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 bat '''
-                docker run --rm %IMAGE_NAME% sh -c "pip install pytest pytest-asyncio && cd /app && pytest tests --maxfail=1 --disable-warnings -q"
+                docker run --rm %IMAGE_NAME% sh -c "pytest /app/tests --maxfail=1 --disable-warnings -q"
                 '''
             }
         }

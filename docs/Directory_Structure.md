@@ -22,6 +22,7 @@
 ├── backend/
 │   ├── routes/                           # FastAPI routes implementation
 │   │   ├── order.py                      # Ordering Products Routes
+│   │   ├── OrderData.py                  # Order Information Routes
 │   │   ├── OTPs.py                       # Verification OTP Routes (SendGrid + Twolio)
 │   │   ├── prodcut.py                    # Products Details Routes
 │   │   ├── seller_products.py            # Seller - Product Interaction Routes
@@ -42,6 +43,8 @@
 │   │       └── User.jpg                  # Default user image
 │   ├── src/
 │   │   ├── components/
+│   │   │   ├── CSS/
+│   │   │   │   └── login.css             # Login Page Styles
 │   │   │   ├── Sellers/
 │   │   │   │   ├── ProductModal.jsx      # Add Product Functionality
 │   │   │   │   ├── Products.jsx          # Seller's Product Component
@@ -63,12 +66,17 @@
 │   ├── .gitignore                        # Git ignore rules
 │   ├── package.json                      # NPM project dependencies
 │   ├── package-lock.json                 # Locked versions of NPM packages
-│   └── README.md                         # Frontend setup and usage guide
+│   ├── vite-config.js                    # Vite setup and Tailwind integration
+│   └── README.md                         # Vercel hosting support
+│
+├── tests/
+│   └── basic_test.py                     # Initial API tests + Login tests
 │
 ├── docs/
 │   ├── Directory_Structure.md            # Visual and written directory structure
 │   ├── HunarBazaar.jpeg                  # Brand Mark
 │   ├── Hunar_Bazaar_title.jpeg           # Brand Logo
+│   ├── Hunar_Bazaar_Schema.jpeg          # MongoDB Schema for project
 │   └── login_background.jpeg             # Brand Serving Background
 │
 ├── .gitignore                            # Git ignore rules for project root

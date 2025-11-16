@@ -12,27 +12,21 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 FROM base AS builder
-COPY dependencies/AES_Implementation ./dependencies/AES_Implementation
+COPY . /app
 
-RUN cmake -S dependencies/AES_Implementation \
-          -B dependencies/AES_Implementation/build \
+RUN cmake -S /app/dependencies/AES_Implementation \
+          -B /app/dependencies/AES_Implementation/build \
           -DCMAKE_BUILD_TYPE=Release \
- && cmake --build dependencies/AES_Implementation/build --config Release \
- && cmake --install dependencies/AES_Implementation/build --prefix /usr/local \
- && ls -lh dependencies/AES_Implementation/build
+ && cmake --build /app/dependencies/AES_Implementation/build --config Release \
+ && cmake --install /app/dependencies/AES_Implementation/build --prefix /usr/local
 
 FROM python:3.11-slim AS runtime
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
- && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
 COPY --from=base /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local /usr/local
-COPY --from=builder /app/dependencies/AES_Implementation/build /app/dependencies/AES_Implementation/build
+COPY --from=builder /app /app
 
-COPY . .
-RUN ls -lh /usr/local/bin || true
 EXPOSE 8000
-ENV PYTHONUNBUFFERED=1
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

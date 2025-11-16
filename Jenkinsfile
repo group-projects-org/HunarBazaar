@@ -8,6 +8,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/group-projects-org/HunarBazaar.git'
@@ -28,33 +29,33 @@ pipeline {
         stage('Start Docker') {
             steps {
                 powershell '''
-                Write-Host "Checking if Docker is already running..."
+                Write-Host "Checking if Docker is running..."
 
                 try {
                     docker info | Out-Null
-                    Write-Host "✅ Docker is already running. Skipping start."
+                    Write-Host "✅ Docker is already running."
                 } catch {
-                    Write-Host "⚙️ Docker not running. Starting Docker Desktop..."
+                    Write-Host "⚙️ Starting Docker Desktop..."
                     Start-Process "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe"
-                    Write-Host "⏳ Waiting for Docker daemon to start..."
+
+                    Write-Host "⏳ Waiting for Docker daemon..."
                     $maxTries = 20
-                    for ($i = 0; $i -lt $maxTries; $i++) {
+                    for ($i=0; $i -lt $maxTries; $i++) {
                         try {
                             docker info | Out-Null
-                            Write-Host "✅ Docker is ready!"
+                            Write-Host "✅ Docker Ready!"
                             exit 0
                         } catch {
                             Start-Sleep -Seconds 5
                             Write-Host "Docker not ready yet..."
                         }
                     }
-                    Write-Error "❌ Docker did not start in time."
+                    Write-Error "❌ Docker timeout."
                     exit 1
                 }
                 '''
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
@@ -65,15 +66,13 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 bat '''
-                docker run --rm %IMAGE_NAME% sh -c "pip install pytest && pytest --maxfail=1 --disable-warnings -q"
+                docker run --rm %IMAGE_NAME% sh -c "pytest tests --maxfail=1 --disable-warnings -q"
                 '''
             }
         }
 
         stage('Push to DockerHub') {
-            when {
-                branch 'master'
-            }
+            when { branch 'master' }
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKERHUB_PASS')]) {
                     bat '''

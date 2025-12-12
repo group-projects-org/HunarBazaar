@@ -13,7 +13,8 @@ import ProductDetail from './components/productDetail.jsx'
 function App() {  
   return (
     <Routes>
-      <Route path="/" element={<LoginRegister />} />
+      <Route path="/Login" element={<LoginRegister />} />
+      <Route path="/" element={<Home />} />
       <Route path="/Home" element={<Home />} />
       <Route path="/Products" element={<ProductsPage />} />
       <Route path="/Products/:product_id/:user_type" element={<ProductDetail />} />

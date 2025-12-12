@@ -28,6 +28,7 @@ const ProductCards = ({ cart, navigate, editable = false, setCart }) => {
 };
 
 const CartCheckout = () => {
+  const DELIVERY_CHARGE = 40.00;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cart, setCart] = useState([]);
@@ -62,6 +63,7 @@ const CartCheckout = () => {
   const filteredCart = searchInput.trim() === ''? cart : cart.filter(({ name }) => name?.toLowerCase().includes(searchInput.toLowerCase()));
 
   const total = cart.reduce((sum, item) => sum + item.price * item.orderQty, 0);
+  const savings = cart.reduce((sum, item) => sum + item.savings * item.orderQty, 0);
   
   const handleField = (field) => (e) => {setBilling({ ...billing, [field]: e.target.value });};
   const handlePincodeChange = async (e) => {
@@ -138,15 +140,33 @@ const CartCheckout = () => {
           <h1 className="font-bold text-2xl m-2.5" style={{fontFamily: "Merriweather, Cambria, serif"}}>Checkout</h1>
           <div className="flex flex-wrap justify-center gap-[15px] w-full box-border p-5"><ProductCards cart={cart} navigate={navigate} editable={false} setCart={setCart}/></div>
 
-					{cart.length > 0 && (
-						<div className="w-[90%] sm:w-[70vw] max-w-none border border-[#ccc] rounded-2xl bg-[#f9f9f9] hover:cursor-not-allowed mt-2.5 mr-auto mb-12.5 ml-auto p-5 md:py-7.5 md:px-10">
-							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span>Total Items</span><span>{cart.length}</span></div>
-							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span>Cart Total</span><span>₹ {total.toFixed(2)}</span></div>
-							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span>Delivery Charges</span><span className="price">₹ 40</span></div>
-							<hr className="m-2" />
-							<div className="flex items-center justify-between font-larger text-[17px] md:font-bold py-1 px-0" style={{fontFamily: "Merriweather, Cambria, serif"}}><span className="md:font-bold">Order Total</span><span className="price">₹ {(total + 40).toFixed(2)}</span></div>
-						</div>
-					)}
+          {cart.length > 0 && (
+            <div className="bg-[#e9f7ed] rounded-[10px] border border-[#e0e0e0] text-left px-15 py-7 w-[90%] mx-auto mb-5 shadow-[0_2px_12px_rgba(0,0,0,0.08)]" style={{fontFamily: "'Segoe UI', sans-serif"}}>
+              <center><h1 className="text-3xl text-[#28a745] mt-[5px] mr-0 my-5 ml" style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>Order Summary</h1></center>
+              <div className="flex justify-between items-center" style={{margin:"6px 0"}}>
+                <span className="font-bold" style={{fontFamily: "Merriweather"}}>Cart Total:</span>
+                <span>₹ {(total + savings).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center" style={{margin:"6px 0"}}>
+                <span className="font-bold" style={{fontFamily: "Merriweather"}}>Discount:</span>
+                <span> - ₹ {savings.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center" style={{margin:"6px 0"}}>
+                <span className="font-bold" style={{fontFamily: "Merriweather"}}>Delivery Charges:</span>
+                <span>+ ₹ {DELIVERY_CHARGE.toFixed(2)}</span>
+              </div>
+              <hr className="border border-[#ddd] h-0.5 bg-black my-2" />
+              <div className="flex justify-between items-center" style={{margin:"6px 0"}}>
+                <span className="font-bold" style={{fontFamily: "Merriweather"}}>Order Total:</span>
+                <span>₹ {(total + DELIVERY_CHARGE).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center" style={{margin:"6px 0"}}>
+                <span className="font-bold" style={{fontFamily: "Merriweather"}}>Total Items:</span>
+                <span>{cart.length} items</span>
+              </div>
+              <center><span className="text-3xl text-green-700 font-bold" style={{fontFamily: "Great Vibes, cursive"}}>Your total savings on this order is: </span><span className="text-xl text-green-700 font-bold" style={{fontFamily: "Merriweather"}}>₹ {savings.toFixed(2)}</span></center>
+            </div>
+          )}
 
           <div className="bg-[#f9f9f9] w-[90%] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] my-5 mb-10 md:mb-5 mx-auto py-6 px-10 md:py-10 md:px-14" style={{fontFamily: "'Segoe UI', sans-serif"}}>
             <h1 className="text-3xl text-[#28a745] mt-[5px] mr-0 my-5 ml" style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>Billing and Payments</h1>

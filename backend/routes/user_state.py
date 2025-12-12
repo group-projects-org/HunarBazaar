@@ -47,24 +47,35 @@ def verify_token(request: Request):
     except:
         return JSONResponse(status_code=401, content={"message": "Invalid token"})
 
-@user_route.post('/login')
-async def login(request: Request):
+@user_route.post('/check_login')
+async def check_login(request: Request):
     data = await request.json()
     username = data.get("username")
     userType = data.get("userType")
     password = data.get("password")
-
     if not username or not password or not userType:
         return JSONResponse(content={'error': 'Missing required fields'}, status_code=400)
-
     collection = db[userType]
     document = await collection.find_one({"username": username})
     if not document:
         return JSONResponse(content={"error": "User Not Found"}, status_code=401)
     if not check_password_hash(document.get("password"), password):
         return JSONResponse(content={"error": "Password is Incorrect"}, status_code=401)
-
     id_key = "user_id" if userType in ["users", "sellers"] else "agent_id"
+    user_id = document.get(id_key)
+    TFA = document.get("TFA", False)
+    if not TFA: return JSONResponse(content={"user_id": user_id, "TFA": TFA}, status_code=200)
+    return JSONResponse(content={"user_id": user_id, "TFA": TFA, "email": document.get("email")}, status_code=200)
+
+@user_route.post('/login')
+async def login(request: Request):
+    data = await request.json()
+    user_id = data.get("user_id")
+    userType = data.get("userType")
+    collection = db[userType]
+    id_key = "user_id" if userType in ["users", "sellers"] else "agent_id"
+    document = await collection.find_one({id_key: user_id})
+
     user_id = document.get(id_key)
 
     token_data = {"user_id": user_id, "username": document["username"], "email": document["email"], "phone": document["phone"], "userType": userType, }
@@ -76,20 +87,17 @@ async def login(request: Request):
 class UserDetails(BaseModel):
     username: str
     email: EmailStr
-    phone: str
     password: str
     userType: str
 
 @user_route.post("/register")
 async def register(user: UserDetails):
-    username = user.username
     email = user.email
-    phone = user.phone
     userType = user.userType
 
     if userType not in ["users", "sellers"]: raise HTTPException(status_code=400, detail="Invalid userType")
     collection = db[userType]
-    existing_user = await collection.find_one({"$or": [{"email": email}, {"phone": phone}]})
+    existing_user = await collection.find_one({"$or": [{"email": email}]})
 
     if existing_user:
         logger.error("❌ User already exists with the same email, or phone")

@@ -8,6 +8,7 @@ const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 const Header = ( {userType}) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [error, setError] = useState(null);
+  const loggedIn = !!localStorage.getItem("username");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const userTabs = [
@@ -25,7 +26,10 @@ const Header = ( {userType}) => {
   ]; 
   const handleLogoutClick = async () => {
     setError("Logging Out...");
-    const cart = localStorage.getItem('cart');
+    const rawCart = localStorage.getItem("cart");
+    let cart = [];
+    try {cart = JSON.parse(rawCart) || [];}
+    catch {cart = [];}
     try {
       const response = await axios.post(`${BASE_URL}/api/logout`, { cart }, {
         headers: { 'Content-Type': 'application/json' },
@@ -75,12 +79,14 @@ const Header = ( {userType}) => {
         </div>
 
         <div ref={dropdownRef} className="flex items-center gap-4 text-black relative cursor-pointer" style={{marginRight: "15px"}} onClick={() => setDropdownVisible(!dropdownVisible)} >
-          <span className="overflow-hidden hover:text-[#333]" style={{ fontFamily: "Bricolage Grotesque, sans-serif" }}>{localStorage.getItem("username")}</span>
+          <span className="overflow-hidden hover:text-[#333]" style={{ fontFamily: "Bricolage Grotesque, sans-serif" }}>
+            {loggedIn? localStorage.getItem("username") : <button onClick={() => navigate('/Login')} className='font-bold hover:underline cursor-pointer py-4 text-[14px]' style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>Hello, Login</button>}
+          </span>
           <img src={'/assets/User.jpg'} alt="User" className="w-8 h-8 rounded-[50%] bg-[#2563eb] text-white flex items-center justify-center font-medium" />
           {dropdownVisible && (
-          <div className="absolute top-full whitespace-nowrap right-0 bg-white shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-sm z-10" style={{padding: "8px"}}>
-            <button className="w-full block text-left cursor-pointer hover:bg-[#e4e4e4] rounded-sm bg-transparent border-none" style={{padding: "8px"}}>View Profile </button>
-            <button onClick={handleLogoutClick} className="w-full block text-left cursor-pointer rounded-sm hover:bg-[#e4e4e4] bg-transparent border-none" style={{padding: "8px"}}> Logout </button>
+          <div className="absolute top-full whitespace-nowrap right-0 bg-white shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-sm z-10 p-2">
+            <button className="w-full block text-left cursor-pointer hover:bg-[#e4e4e4] rounded-sm bg-transparent border-none disabled:hover:bg-transparent disabled:cursor-not-allowed disabled={!loggedIn} px-4 py-2" disabled={!loggedIn}>View Profile </button>
+            <button onClick={handleLogoutClick} className="w-full block text-left cursor-pointer rounded-sm hover:bg-[#e4e4e4] bg-transparent border-none disabled:hover:bg-transparent disabled:cursor-not-allowed px-4 py-2" disabled={!loggedIn}> Logout </button>
           </div> )}
         </div>
       </div>

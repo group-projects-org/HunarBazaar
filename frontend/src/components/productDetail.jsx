@@ -69,7 +69,7 @@ const ProductDetail = () => {
           if (updatedCart[index].orderQty <= 0) updatedCart.splice(index, 1);
         }
       } else {
-        updatedCart.push({id: Number(product_id), name: product.name, price: product.price, image: product?.images?.[0] || "", orderSize: selectedSize, orderColor: selectedColor, orderQty: 1, maxQty: maxQuantity.current,});
+        updatedCart.push({id: Number(product_id), name: product.name, price: product.price, image: product?.images?.[0] || "", orderSize: selectedSize, orderColor: selectedColor, orderQty: 1, maxQty: maxQuantity.current, savings: Math.floor(product.price + product.price / 5) - product.price});
       } localStorage.setItem("cart", JSON.stringify(updatedCart));
       return updatedCart;
     });

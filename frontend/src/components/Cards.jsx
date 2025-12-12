@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 const CategoryCard = ({ category }) => {
   const navigate = useNavigate();
   return(
-    <div className="w-[45%] md:w-[calc(33.33%-15px)] lg:w-[calc(25%-15px)] border border-[rgba(0,0,0,0.1)] rounded-lg text-center bg-transparent shadow-[0_4px_6px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] overflow-hidden" style={{padding: "15px", marginBottom: "10px"}} onClick={() => navigate(`/Products?category=${encodeURIComponent(category)}`)}> 
-      <img className='w-full h-[200px] sm:h-[450px] lg:h-[350px] object-cover rounded-[5px]' style={{marginBottom: "10px"}} src={`/assets/Categories/${category}.jpeg`} alt={category} />
+    <div className="w-[45%] md:w-[calc(33.33%-15px)] lg:w-[calc(25%-15px)] border border-[rgba(0,0,0,0.1)] rounded-lg text-center bg-transparent shadow-[0_4px_6px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105 hover:shadow-[0_6px_10px_rgba(0,0,0,0.15)] overflow-hidden p-[15px] mb-2.5" onClick={() => navigate(`/Products?category=${encodeURIComponent(category)}`)}> 
+      <img className='w-full h-[200px] sm:h-[450px] lg:h-[350px] object-cover rounded-[5px] mb-2.5' src={`/assets/Categories/${category}.jpeg`} alt={category} />
       <div>
         <h3 className='text-[20px] md:text-[25px] text-[#3CBF4E] font-bold' style={{fontFamily: "'Great Vibes', cursive"}}>{category}</h3>
         <p className="text-[10px] md:text-[16px] gap-2.5 break-word" style={{fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"}}>Explore our wide range of {category} products.</p>

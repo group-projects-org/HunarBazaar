@@ -34,7 +34,10 @@ const LoginRegister = () => {
           localStorage.setItem("username", res.data.username);
           navigate(res.data.userType === "sellers" ? "/seller/Home" : res.data.userType === "agents" ? "/agent/" : "/Home");
         }
-      } catch (err) { console.error("❌ No active session:", err.response?.data?.message || err.message); }
+      } catch (err) { 
+        console.error("❌ No active session:", err.response?.data?.message || err.message);
+        localStorage.removeItem("username");
+      }
     }; verifyToken();
   }, [navigate]);
 
@@ -167,17 +170,21 @@ const LoginRegister = () => {
    
   const handleOtpSubmit = async (type = 0) => {
     const otpId = localStorage.getItem("tempOTPId");
-    try {
+    if (!otpId) {
+      alert("OTP expired. Please request again.");
+      return false;
+    } try {
       const res = await axios.post(`${BASE_URL}/api/captcha_otp/validate`, { id:otpId, answer:OTP });
       const data = res.data;
       if (data.valid){
         if (type !== 1) setIsEmailVerified("Yes");
         else setTFAEmailVerified("Yes");
         setOTP(""); localStorage.removeItem("tempOTPId");
+        return true;
       } else {
         alert("Incorrect OTP");
-        setOTP("");
-      } return data.valid;
+        setOTP(""); return false;
+      }
     } catch (err) {
       console.error("Error validating OTP:", err);
       return false;
@@ -268,7 +275,10 @@ const LoginRegister = () => {
             </div>)}
             {TFAEmailVerified  === 'Verifying' && (<div className="input-box">
               <input type="number" name="otp" placeholder="OTP" value={OTP} onChange={(e) => setOTP(e.target.value)} pattern="[0-9]{6}" required/><span>{timer.minutes}:{timer.seconds}</span>
-              <button type="submit" className="btn" disabled={OTP.length !== 6 && !recaptchaValidated} onClick={() => handleOtpSubmit(1)}>Submit</button>
+              <button type="submit" className="btn" disabled={OTP.length !== 6 && !recaptchaValidated} onClick={async () => {
+                const ok = await handleOtpSubmit(1);
+                if (!ok) navigate("/Login");
+              }}>Submit</button>
             </div>)}{TFAEmailVerified === "Yes" && (<div className="input-box">
             <input type="text" placeholder="Email"  name="email" value={formData.email} disabled={true} required /><button type="button" className="btn">Verified</button><i className='bx bxs-envelope'></i>
           </div>)}

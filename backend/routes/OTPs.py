@@ -1,7 +1,5 @@
 import os, secrets, smtplib, redis, io, base64, random, string, requests
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.concurrency import run_in_threadpool
 from backend.config import logger
@@ -20,73 +18,66 @@ def random_string(length=5):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def send_email(receiver_email: str, otp_code: str) -> bool:
-    sender_email = os.getenv("GMAIL_APP_MAIL")
-    app_password = os.getenv("GMAIL_APP_PASSWORD")
+    resend_api_key = os.getenv("RESEND_API_KEY")
+    sender_email = "हुनरBazaar.com OTP <no-reply@hunarbazaar.com>"
+    html_content = f"""
+    <html>
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Eagle+Lake&display=swap" rel="stylesheet">
+      </head>
+      <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
+        <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px;
+                    overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+
+          <div style="background: linear-gradient(#3cbf4e, #2ecc71); padding: 20px; text-align: center;">
+            <img src="https://raw.githubusercontent.com/group-projects-org/HunarBazaar/master/docs/Hunar_Bazaar.jpeg"
+                 style="width: 120px; margin-bottom: 10px;">
+            <h2 style="color: white; margin: 0; font-family: 'Eagle Lake', cursive;">
+              हुनरBazaar Verification
+            </h2>
+          </div>
+
+          <div style="padding: 25px;">
+            <h3>Hello from हुनरBazaar 👋</h3>
+            <p>Use the OTP below to verify your account:</p>
+
+            <div style="text-align: center; margin: 25px 0;">
+              <span style="font-size: 32px; font-weight: bold; color: #ff6600;">
+                {otp_code}
+              </span>
+            </div>
+
+            <p>This OTP is valid for <strong>3 minutes</strong>.</p>
+
+            <p style="font-size: 13px; color: #999; text-align: center;">
+              © 2025 हुनरBazaar. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+    """
 
     try:
-        message = MIMEMultipart("alternative")
-        message["Subject"] = "हुनरBazaar OTP Verification"
-        message["From"] = sender_email
-        message["To"] = receiver_email
-
-        html_content = f"""
-        <html>
-          <head><link href="https://fonts.googleapis.com/css2?family=Eagle+Lake&display=swap" rel="stylesheet"></head>
-          <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
-            <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-
-              <div style="background: linear-gradient(#3cbf4e, #2ecc71); padding: 20px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/group-projects-org/HunarBazaar/master/docs/Hunar_Bazaar.jpeg" alt="हुनरBazaar Logo" style="width: 120px; margin-bottom: 10px;">
-                <h2 style="color: white; margin: 0; font-family: &quot;Eagle Lake&quot;, cursive;">हुनरBazaar Verification</h2>
-              </div>
-
-              <div style="padding: 25px;">
-                <h3 style="color: #333;">Hello from हुनरBazaar 👋</h3>
-                <p style="font-size: 15px; color: #555;">
-                  Thank you for using <strong>हुनरBazaar</strong>.  
-                  To complete your verification, please use the One-Time Password (OTP) below:
-                </p>
-
-                <div style="text-align: center; margin: 25px 0;">
-                  <span style="font-size: 32px; font-weight: bold; color: #ff6600; letter-spacing: 5px;">
-                    {otp_code}
-                  </span>
-                </div>
-
-                <p style="font-size: 14px; color: #777;">
-                  This OTP is valid for <strong>3 minutes</strong>.  
-                  Please do not share it with anyone for security reasons.
-                </p>
-
-                <p style="font-size: 14px; color: #777;">
-                  If you did not request this, please ignore this email or contact our support team immediately.
-                </p>
-
-                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-
-                <p style="font-size: 13px; color: #999; text-align: center;">
-                  © {2025} हुनरBazaar. All rights reserved.<br>
-                  Craftsmanship you can feel, Luxury you can wear. 🇮🇳
-                </p>
-              </div>
-
-            </div>
-          </body>
-        </html>
-        """
-        message.attach(MIMEText(html_content, "html"))
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender_email, app_password)
-            server.sendmail(sender_email, receiver_email, message.as_string())
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {resend_api_key}", "Content-Type": "application/json"},
+            json={"from": sender_email, "to": [receiver_email], "subject": "हुनरBazaar OTP Verification", "html": html_content},
+            timeout=10
+        )
+        response.raise_for_status()
         return True
+
     except Exception as e:
-        print("Error sending OTP Email:", e)
+        print("Resend Email Error:", e)
         return False
 
 @otp_router.post("/captcha_otp/validate")
 def validate(body: dict):
     redis_id = body["id"]
     answer = body["answer"]
+    if not redis_id or not answer:
+        raise HTTPException(status_code=400, detail="Invalid OTP request")
     stored_answer = redis_client.get(redis_id)
     if stored_answer is None: return {"valid": False, "reason": "expired or invalid"}
     if stored_answer.lower() == answer.lower():

@@ -2,8 +2,23 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 from backend.config import db, logger
 from backend.JWT import get_current_user
+from werkzeug.security import generate_password_hash
 
 user_data_route = APIRouter()
+
+@user_data_route.post("/get_email")
+async def getUserData(request: Request):
+    data = await request.json()
+    username = data.get("username")
+    user_type = data.get("userType")
+    if not username or not user_type:
+        raise HTTPException(status_code=401, detail="Invalid or missing JWT payload")
+    if user_type not in ("users", "sellers", "agents"):
+        raise HTTPException(status_code=400, detail="Invalid userType")
+    user_data = await db[user_type].find_one({"username": username}, {"_id": 0, "email": 1})
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"email": user_data["email"]}
 
 @user_data_route.get("/userData")
 async def getUserData(request: Request):
@@ -43,3 +58,16 @@ async def subscriptionChanges(request: Request):
     except Exception as e:
         logger.error(f"❌ Subscription update error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@user_data_route.post("/reset_password")
+async def reset_password(request: Request):
+    data = await request.json()
+    username = data.get("username")
+    user_type = data.get("userType")
+    new_password = data.get("newPassword")
+    if not all([username, user_type, new_password]):
+        raise HTTPException(status_code=400, detail="Missing required fields")
+    hashed_password = generate_password_hash(new_password)
+    result = await db[user_type].update_one({"username": username}, {"$set": {"password": hashed_password}})
+    if result.matched_count == 0: raise HTTPException(status_code=404, detail="User not found")
+    return JSONResponse(content={"message": "Password reset successful"}, status_code=200)

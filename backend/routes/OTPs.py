@@ -1,4 +1,4 @@
-import os, secrets, smtplib, redis, io, base64, random, string
+import os, secrets, smtplib, redis, io, base64, random, string, requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from fastapi import APIRouter, Request
@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 otp_router = APIRouter()
 REDIS_REST_URL=os.getenv("REDIS_REST_URL")
+RECAPTCHA_SECRET_KEY=os.getenv("RECAPTCHA_SECRET_KEY")
 redis_client = redis.Redis.from_url(REDIS_REST_URL, decode_responses=True)
 
 def generate_otp():
@@ -152,3 +153,19 @@ def new_captcha():
     image_data = generate_image(text)
     redis_client.setex(captcha_id, 120, text)
     return {"captchaId": captcha_id, "image": image_data}
+
+@otp_router.post("/captcha_otp/recaptcha")
+async def recaptcha(request: Request):
+    try:
+        data = await request.json()
+        token = data.get("token")
+        if not token:
+            return JSONResponse(content={"error": "Captcha token missing"}, status_code=400)
+        captcha_url = "https://www.google.com/recaptcha/api/siteverify"
+        captcha_data = {"secret": RECAPTCHA_SECRET_KEY, "response": token}
+        captcha_res = requests.post(captcha_url, data=captcha_data).json()
+        if not captcha_res.get("success"):
+            return JSONResponse(content={"error": "reCAPTCHA verification failed"}, status_code=400)
+        return {"message": "Captcha verified", "success": True}
+    except Exception as e:
+        return JSONResponse(content={"error": f"Internal Server Error: {str(e)}"}, status_code=500)

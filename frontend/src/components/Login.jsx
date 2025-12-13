@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './CSS/login.css';
 import { useNavigate } from 'react-router-dom';
-import { CodeCaptcha } from './Captchas';
+import { CodeCaptcha, Recaptcha } from './Captchas';
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
@@ -20,6 +20,8 @@ const LoginRegister = () => {
   const [userId, setUserId] = useState(null);
   const [TFA, setTFA] = useState(false);
   const [TFAEmailVerified, setTFAEmailVerified] = useState('No');
+  const [recaptchaValidated, setRecaptchaValidated] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,11 +30,11 @@ const LoginRegister = () => {
         let res = await axios.get(`${BASE_URL}`, {withCredentials: true,}); 
         res = await axios.get(`${BASE_URL}/api/verify-token`, { withCredentials: true,
         }); if (res.data.valid) {
-          console.log("✅ Auto-login success:", res.data);
+          console.log("✅ Auto-login success:");
           localStorage.setItem("username", res.data.username);
           navigate(res.data.userType === "sellers" ? "/seller/Home" : res.data.userType === "agents" ? "/agent/" : "/Home");
         }
-      } catch (err) { console.log("❌ No active session:", err.response?.data?.message || err.message); }
+      } catch (err) { console.error("❌ No active session:", err.response?.data?.message || err.message); }
     }; verifyToken();
   }, [navigate]);
 
@@ -57,23 +59,11 @@ const LoginRegister = () => {
     } catch (err) { console.error("Username check failed:", err);}
   };
 
-  const afterSuccessfulTFA = async (e) => {
-    e.preventDefault();
-    setIsLoggingIn(true);
-    if (!TFA) return;
-    try {
-      commonLoginAfterTFA(userId);
-    } catch (error) {
-      if (error.response) alert(`Login failed: ${error.response.data.error || "Unknown error"}`);
-      else alert("An error occurred during login.");
-      console.error("Login error:", error);
-    } setIsLoggingIn(false);
-  }
-
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setIsLoggingIn(true);
     try {
+      setForgotPassword(false); setConfirmPassword("");
       const { data } = await axios.post(`${BASE_URL}/api/check_login`, formData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
@@ -81,7 +71,6 @@ const LoginRegister = () => {
       setTFA(data.TFA);
       setFormData(prev => ({...prev, email: data.email }));
       if (!data.TFA) commonLoginAfterTFA( data.user_id );
-      else HandleEmailVerify(1);
     } catch (error) {
       if (error.response) alert(`Login failed: ${error.response.data.error || "Unknown error"}`);
       else alert("An error occurred during login.");
@@ -99,15 +88,18 @@ const LoginRegister = () => {
         if (map.has(key)) map.get(key).orderQty = item.orderQty;
         else map.set(key, { ...item });
       }); return [...map.values()];
-    }; const { data } = await axios.post(`${BASE_URL}/api/login`, {"user_id": localUserId, "userType": formData.userType}, {
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    }); const guestCart = JSON.parse(localStorage.getItem("cart") || "[]"); 
-    localStorage.setItem("username", data.username);
-    const serverCart = data.cart || [];
-    const mergedCart = mergeCarts(guestCart, serverCart);
-    localStorage.setItem("cart", JSON.stringify(mergedCart));
-    navigate(formData.userType !== "sellers" ? "/Home" : "/seller/Home");
+    }; try{
+      const { data } = await axios.post(`${BASE_URL}/api/login`, {"user_id": localUserId, "userType": formData.userType}, { headers: { "Content-Type": "application/json" }, withCredentials: true, }); 
+      const guestCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      localStorage.setItem("username", data.username);
+      const serverCart = data.cart || [];
+      const mergedCart = mergeCarts(guestCart, serverCart);
+      localStorage.setItem("cart", JSON.stringify(mergedCart));
+      navigate(formData.userType !== "sellers" ? "/Home" : "/seller/Home");
+    } catch (error) {
+      console.error("Post-TFA login error:", error);
+      alert("An error occurred during post-TFA login.");
+    }
   };
 
   const handleRegisterSubmit = async (e) => {
@@ -143,38 +135,43 @@ const LoginRegister = () => {
           if (totalSeconds <= 1) {
             clearInterval(timerRef.current);
             if (isEmailVerified === "Verifying") setIsEmailVerified("No");
-            if (TFAEmailVerified === "Verifying") setTFAEmailVerified("No");
-            localStorage.removeItem("tempOTP");
+            if (TFAEmailVerified === "Verifying"){
+              alert("Error Occurred! Please try logging in again."); 
+              setTFA(false); navigate("/Login"); 
+              setTFAEmailVerified("No");
+            } localStorage.removeItem("tempOTP");
             return { minutes: 0, seconds: 0 };
           } const nextTotalSeconds = totalSeconds - 1;
           return {
             minutes: Math.floor(nextTotalSeconds / 60),
             seconds: nextTotalSeconds % 60,
-          };});}, 1000);}return () => clearInterval(timerRef.current);
+          };});}, 1000);} return () => clearInterval(timerRef.current);
   }, [isEmailVerified, TFAEmailVerified]);  
 
-  const HandleEmailVerify = async ( type = 0 ) => {
+  const HandleEmailVerify = async (type = 0, email = null) => {
     try {
-      if (type != 1) setIsEmailVerified("Verifying");
+      if (type !== 1) setIsEmailVerified("Verifying");
       else setTFAEmailVerified("Verifying");
       setTimer({minutes: 2, seconds: 59});
       const res = await axios.post(`${BASE_URL}/api/send-email-otp`, {
-        email: formData.email
+        email: email || formData.email,
       }); localStorage.setItem("tempOTPId", res.data.otpId);
+      return 1;
     } catch (err) {
       console.error("OTP sending failed:", err);
-      if (type != 1) setIsEmailVerified("No");
+      if (type !== 1)setIsEmailVerified("No");
       else setTFAEmailVerified("No");
+      return 0;
     }
   };
    
-  const handleOtpSubmit = async ( type = 0 ) => {
+  const handleOtpSubmit = async (type = 0) => {
     const otpId = localStorage.getItem("tempOTPId");
     try {
       const res = await axios.post(`${BASE_URL}/api/captcha_otp/validate`, { id:otpId, answer:OTP });
       const data = res.data;
       if (data.valid){
-        if (type != 1) setIsEmailVerified("Yes");
+        if (type !== 1) setIsEmailVerified("Yes");
         else setTFAEmailVerified("Yes");
         setOTP(""); localStorage.removeItem("tempOTPId");
       } else {
@@ -186,6 +183,36 @@ const LoginRegister = () => {
       return false;
     }
   };
+
+  const InitiateForgotPassword = async () => {
+    if (formData.username.length === 0){
+      alert("Please enter your username first.");
+      return;
+    } setTFA(false); setRecaptchaValidated(false);
+    setConfirmPassword(""); setFormData(prev => ({...prev, password: ""}));
+    try{
+      const { data } = await axios.post(`${BASE_URL}/api/get_email`, {username: formData.username, userType: formData.userType,}, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }); setFormData(prev => ({...prev, email: data.email })); setForgotPassword(true); 
+    } catch (error) {
+      if (error.response) alert(`Error: ${error.response.data.detail || "Unknown error"}`);
+      else alert("An error occurred while fetching email.");
+      console.error("Fetch email error:", error);
+      setForgotPassword(false);
+    }
+  }
+  const ResetForgotPassword = () => {
+    try{
+      axios.post(`${BASE_URL}/api/reset_password`, {username: formData.username, userType: formData.userType, newPassword: formData.password,}, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }); alert("Password reset successful. Please login with your new password.");
+    } catch (error) {
+      if (error.response) alert(`Error: ${error.response.data.error || "Unknown error"}`);
+      else alert("An error occurred while resetting password.");  
+    } setForgotPassword(false); setTFAEmailVerified("No"); setFormData(prev => ({...prev, password: ""})); navigate("/Login");
+  }
 
   return (
     <div className='flex flex-col min-h-screen w-full justify-center items-center bg-[url("/assets/login_background.jpeg")] bg-cover bg-no-repeat bg-center overflow-hidden'>
@@ -200,7 +227,7 @@ const LoginRegister = () => {
             <p className='text-[12px] font-bold text-[#BCAA99] uppercase' style={{fontFamily:"Montserrat, Poppins, sans-serif"}}>Luxury, Crafted by Talent</p>
           </div>
         </div>
-        {!TFA? (<>
+        {(!TFA && !forgotPassword)? (<>
           <h1 className='text-[50px] font-bold text-[#BFB28C]' style={{margin:"20px 0", fontFamily:"Great Vibes, cursive"}}>Login</h1>
           <form className= "w-full" onSubmit={handleLoginSubmit}>
             <div className="input-box">
@@ -210,7 +237,8 @@ const LoginRegister = () => {
             <div className="input-box">
               <input type="password" placeholder="Password"  name="password" value={formData.password} onChange={handleChange} required />
               <i className='bx bxs-lock-alt'></i>
-            </div>
+            </div> 
+            <button type="button" className='text-[13px] underline mb-2.5 cursor-pointer' style={{fontFamily: "Montserrat"}} onClick={InitiateForgotPassword}>Forgot Password?</button>
             <button type="submit" className="btn" disabled={isLoggingIn}>{isLoggingIn ? "Logging In..." : "LogIn"}</button>
             <div className="role-toggle">
               <div className={`toggle-option ${formData.userType === 'users' ? 'active' : ''}`} onClick={() => setFormData({ ...formData, userType: 'users' })}>User</div>
@@ -224,16 +252,39 @@ const LoginRegister = () => {
             <button className="btn h-[46px] border-2 border-white shadow-none" style={{width:"30%"}} onClick={handleRegisterClick}>Register</button>
           </div>
         </>):(<>
-          <h1 className='text-[40px] font-bold text-[#BFB28C] mb-0 mt-5 mx-0' style={{fontFamily:"Great Vibes, cursive"}}>Two-Factor Authentication</h1>
+          <h1 className='text-[40px] font-bold text-[#BFB28C] mb-0 mt-5 mx-0' style={{fontFamily:"Great Vibes, cursive"}}>{forgotPassword? "Forgot Password" : "Two-Factor Authentication"}</h1>
           <span className='mb-10 mt-0' style={{fontFamily: "'Montserrat', 'Poppins', sans-serif"}}>You Security, Our Responsibility</span>
-          <span className='mb-2 text-[9px]' style={{fontFamily: "'Montserrat', 'Poppins', sans-serif"}}>For added security, please enter the code that has been sent to the registered email</span>
-          <form className="w-full" onSubmit={afterSuccessfulTFA}>
-            {TFAEmailVerified  === 'Verifying' && (<div className="input-box">
-              <input type="number" name="otp" placeholder="OTP" value={OTP} onChange={(e) => setOTP(e.target.value)} pattern="[0-9]{6}" required/><span>{timer.minutes}:{timer.seconds}</span><button type="button" className="btn" disabled={OTP.length !== 6} onClick={() => handleOtpSubmit(1)}>Submit</button>
-            </div>)}{TFAEmailVerified === "Yes" && (<div className="input-box">
-              <input type="text" placeholder="Email"  name="email" value={formData.email} onChange={handleChange} disabled={true} required /><button type="button" className="btn">Verified</button><i className='bx bxs-envelope'></i>
+          {!forgotPassword && <span className='mb-2 text-[9px]' style={{fontFamily: "'Montserrat', 'Poppins', sans-serif"}}>For added security, please enter the code that has been sent to the registered email</span>}
+          <form className="w-full" onSubmit={(e) => {e.preventDefault(); commonLoginAfterTFA(userId)}}>
+            {TFAEmailVerified === "No" && (<div className="input-box">
+              <input type="number" name="otp" placeholder="OTP" value={OTP} onChange={(e) => setOTP(e.target.value)} pattern="[0-9]{6}" disabled={TFAEmailVerified !== "Verifying"} required/>
+              <button type="button" className="btn min-w-28" disabled={!recaptchaValidated} onClick={() => {
+                const result = HandleEmailVerify(1, formData.email);
+                if (TFA && result === 0){
+                  alert("Error Occurred! Please try logging in again."); 
+                  setTFA(false); navigate("/Login"); 
+                }
+              }}>Send OTP</button><i className='bx bxs-envelope'></i>
             </div>)}
-            <button type="submit" className="btn" disabled={isLoggingIn || !TFAEmailVerified}>{isLoggingIn ? "Verifying..." : "Verified"}</button>
+            {TFAEmailVerified  === 'Verifying' && (<div className="input-box">
+              <input type="number" name="otp" placeholder="OTP" value={OTP} onChange={(e) => setOTP(e.target.value)} pattern="[0-9]{6}" required/><span>{timer.minutes}:{timer.seconds}</span>
+              <button type="submit" className="btn" disabled={OTP.length !== 6 && !recaptchaValidated} onClick={() => handleOtpSubmit(1)}>Submit</button>
+            </div>)}{TFAEmailVerified === "Yes" && (<div className="input-box">
+            <input type="text" placeholder="Email"  name="email" value={formData.email} disabled={true} required /><button type="button" className="btn">Verified</button><i className='bx bxs-envelope'></i>
+          </div>)}
+            <Recaptcha validated={setRecaptchaValidated}/>
+            {forgotPassword && (<>
+              <div className="input-box">
+                <input type="password" placeholder="Password" name="password" value={formData.password} onChange={handleChange} required />
+                <i className='bx bxs-lock-alt'></i>
+              </div>
+              <div className="input-box">
+                <input type="password" placeholder="Confirm Password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                <i className='bx bxs-lock-alt'></i>
+              </div>
+              {confirmPassword.length > 0 && confirmPassword !== formData.password && (<p style={{ color: "red", fontSize: "12px", marginTop: "-0.5rem" }}>Passwords do not match</p>)}
+              <button type="button" className="btn" disabled={TFAEmailVerified !== "Yes" || formData.password.length === 0 || confirmPassword !== formData.password || !recaptchaValidated} onClick={ResetForgotPassword}>{isLoggingIn ? "Resetting..." : "Reset Password"}</button>
+            </>)}
           </form>
         </>)
       }</div>

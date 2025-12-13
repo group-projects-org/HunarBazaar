@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
 import { FiRefreshCw } from "react-icons/fi";
 import { HiCheck } from "react-icons/hi";
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const CodeCaptcha = ({validated, isActive}) => {
   const [captchaImg, setCaptchaImg] = useState("");
@@ -51,4 +53,18 @@ const CodeCaptcha = ({validated, isActive}) => {
   );
 };
 
-export { CodeCaptcha };
+const Recaptcha = ({ validated }) => {
+  const handleCaptcha = async (token) => {
+    try {
+      const res = await axios.post(`${BASE_URL}/api/captcha_otp/recaptcha`, { token });
+      if (res.data.success) validated(true);
+      else validated(false);
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      validated(false);
+    }
+  };
+  return <ReCAPTCHA className="mb-3 " sitekey={RECAPTCHA_SITE_KEY} onChange={handleCaptcha} />
+};
+
+export { CodeCaptcha, Recaptcha };

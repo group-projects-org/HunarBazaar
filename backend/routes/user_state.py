@@ -77,7 +77,6 @@ async def login(request: Request):
     document = await collection.find_one({id_key: user_id})
 
     user_id = document.get(id_key)
-
     token_data = {"user_id": user_id, "username": document["username"], "email": document["email"], "phone": document["phone"], "userType": userType, }
     access_token = create_access_token(data=token_data)
     response = JSONResponse(content={"message": "Login successful", "username": document["username"], "cart": document.get("cart", [])})

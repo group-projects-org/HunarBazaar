@@ -156,8 +156,7 @@ async def set_order(request: Request, data: OrderRequest):
             "HunarPoints": base_order["HunarPoints"]
         }
 
-    except HTTPException:
-        raise
+    except HTTPException: raise
     except Exception as e:
         logger.error(f"❌ Error while creating order: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")

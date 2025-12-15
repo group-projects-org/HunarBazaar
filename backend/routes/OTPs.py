@@ -19,7 +19,7 @@ def random_string(length=5):
 
 def send_email(receiver_email: str, otp_code: str) -> bool:
     resend_api_key = os.getenv("RESEND_API_KEY")
-    sender_email = "हुनरBazaar.com OTP <no-reply@hunarbazaar.com>"
+    sender_email = "हुनरBazaar <no-reply@resend.dev>"
     html_content = f"""
     <html>
       <head>

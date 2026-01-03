@@ -5,7 +5,7 @@ import { TrendingUp, Package, Users, DollarSign } from 'lucide-react';
 import { FaHome, FaInfoCircle, FaBoxOpen, FaShoppingCart, FaClipboardList } from "react-icons/fa";
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
-const Header = ( {userType}) => {
+const Header = ({ userType }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [error, setError] = useState(null);
   const loggedIn = !!localStorage.getItem("username");
@@ -13,16 +13,18 @@ const Header = ( {userType}) => {
   const navigate = useNavigate();
   const userTabs = [
     ["/Home", FaHome, "Home"],
-    ["/About", FaInfoCircle, "About"],
+    ["/About/users", FaInfoCircle, "About"],
     ["/Products", FaBoxOpen, "Products"],
     ["/CartCheckout", FaShoppingCart, "Cart"],
     ["/Orders", FaClipboardList, "Orders"]
   ]; 
   const sellerTabs = [
-  ["/seller/Dashboard", TrendingUp, "Dashboard"],
-  ["/seller/Products", Package, "Product"],
-  ["/seller/Orders", Users, "Orders"],
-  ["/seller/Analytics", DollarSign, " Analytics"]
+    ["/seller/Home", TrendingUp, "Dashboard"],
+    ["/About/sellers", FaInfoCircle, "About"],
+    ["/seller/Products", Package, "Product"],
+    ["/seller/Orders", Users, "Orders"],
+    ["/seller/Analytics", DollarSign, " Analytics"],
+    ["/seller/Invoices", FaClipboardList, "Invoices"]
   ]; 
   const handleLogoutClick = async () => {
     setError("Logging Out...");

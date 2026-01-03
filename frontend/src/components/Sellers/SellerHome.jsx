@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Plus, Edit, Trash2, Package, TrendingUp, DollarSign, Users, Search, Filter, ShoppingBag, BarChart2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Header, Footer } from "../header_footer";
@@ -8,6 +9,7 @@ const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const SellerHome = () => {
   const navigate = useNavigate();
+  const [sellerId, setSellerId] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -44,33 +46,22 @@ const SellerHome = () => {
     }));
   };
 
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    category: '',
-    subcategory: '',
-    price: '',
-    stock: '',
-    description: '',
-    brand: '',
-    material: '',
-    size: [],
-    color: [],
-    images: []
-  });
+  const [newProduct, setNewProduct] = useState({name: '', category: '', subcategory: '', price: '', stock: '', description: '', brand: '', material: '', size: [], color: [], images: [] });
 
   useEffect(() => {
-    // Check if user is a seller
-    const userType = localStorage.getItem('userType');
-
-    fetchSellerData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/userData`, {
+          withCredentials: true,
+        }); const userData = response.data.data;
+        setSellerId(userData.user_id || "");
+      } catch (error) { console.error("❌ Error fetching user data:", error);}
+    }; fetchUserData();
+  }, []);
 
   const fetchSellerData = async () => {
     setIsLoading(true);
     try {
-      const sellerId = localStorage.getItem('userId');
-      
       if (!sellerId) {
         console.error('No seller ID found in localStorage');
         alert('Please log in again to access your dashboard');

@@ -9,11 +9,22 @@ import CusAgentOrder from './components/cus_agent_order.jsx';
 import Orders from './components/Users/orders.jsx';
 import ProductsListed from './components/Sellers/Products.jsx';
 import ProductDetail from './components/productDetail.jsx'
+import PrivacyPolicy from './components/PrivacyPolicy.jsx';
+import TermsOfService from './components/TermsOfService.jsx';
+import About from './components/About.jsx';
 
 function App() {  
   return (
     <Routes>
       <Route path="/Login" element={<LoginRegister />} />
+      <Route path="/Register" element={<LoginRegister />} />
+      <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+      <Route path="/PrivacyPolicy/:user_type" element={<PrivacyPolicy />} />
+      <Route path="/TermsOfService" element={<TermsOfService />} />
+      <Route path="/TermsOfService/:user_type" element={<TermsOfService />} />
+      <Route path="/About" element={<About />} />
+      <Route path="/About/:user_type" element={<About />} />
+
       <Route path="/" element={<Home />} />
       <Route path="/Home" element={<Home />} />
       <Route path="/Products" element={<ProductsPage />} />

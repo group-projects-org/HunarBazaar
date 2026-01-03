@@ -224,15 +224,5 @@
         "seller_section15_content": "We reserve the right to modify these seller terms at any time. Material changes will be communicated via email or seller dashboard notifications. Continued use of the platform after changes constitutes acceptance of modified terms.",
       
         "seller_section16_title": "Contact Information",
-        "seller_section16_content": "For questions about these Terms of Service, please contact us at:",
-       "seller_section16_email_label": "Email",
-"seller_section16_phone_label": "Phone",
-"seller_section16_address_label": "Address",
-
-
-   
-    
-    "contact_buyer_email": "Email",
-    "contact_seller_email": "Seller Email",
-    "contact_address": "Address"
+        "seller_section16_content": "For questions about these Terms of Service, please contact us at:"
   }

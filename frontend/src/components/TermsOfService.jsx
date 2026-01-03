@@ -1,6 +1,7 @@
 import { Header, Footer } from './header_footer';
 import { useParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import { Globe } from "lucide-react";
 
 const TermsOfService = () => {
   const { user_type } = useParams();
@@ -8,19 +9,13 @@ const TermsOfService = () => {
 
   const BuyerTerms = () => (
     <div>
-      <h3 className='font-bold text-2xl text-green-900 underline my-4' style={{ fontFamily: "Playfair" }}>
-        {t('buyer_terms_heading', { ns: 'terms' })}
-      </h3>
+      <h3 className='font-bold text-2xl text-green-900 underline my-4' style={{ fontFamily: "Playfair" }}>{t('buyer_terms_heading', { ns: 'terms' })}</h3>
 
-      <h4 className='font-bold text-lg text-green-900 mt-4 mb-2'>
-        1. {t('buyer_section1_title', { ns: 'terms' })}
-      </h4>
+      <h4 className='font-bold text-lg text-green-900 mt-4 mb-2'>1. {t('buyer_section1_title', { ns: 'terms' })}</h4>
       <p>{t('buyer_section1_content', { ns: 'terms' })}</p>
       <br />
 
-      <h4 className='font-bold text-lg text-green-900 mt-4 mb-2'>
-        2. {t('buyer_section2_title', { ns: 'terms' })}
-      </h4>
+      <h4 className='font-bold text-lg text-green-900 mt-4 mb-2'>2. {t('buyer_section2_title', { ns: 'terms' })}</h4>
       <p>{t('buyer_section2_intro', { ns: 'terms' })}</p>
       <ul className='list-disc ml-8 my-2'>
         <li>{t('buyer_section2_point1', { ns: 'terms' })}</li>
@@ -165,11 +160,14 @@ const TermsOfService = () => {
       <h4 className='font-bold text-lg text-green-900 mt-4 mb-2'>
         14. {t('buyer_section14_title', { ns: 'terms' })}
       </h4>
+      <p>{t('seller_section16_content', { ns: 'terms' })}</p>
       <p>
-  {t('seller_section16_email_label', { ns: 'terms' })}: vp1246194@gmail.com<br />
-  {t('seller_section16_phone_label', { ns: 'terms' })}: +91-78190-XXXXX<br />
-  {t('seller_section16_address_label', { ns: 'terms' })}: Haldwani, India
-</p>
+        <b>{t('name', { ns: 'common' })}:</b> {t('vineet', { ns: 'common' })}<br />
+        <b>{t('email', { ns: 'common' })}:</b> <a href="mailto:vp1246194@gmail.com" className='font-bold text-blue-500 cursor-pointer'>{t('vineet_email', { ns: 'common' })}</a><br />
+        <b>{t('phone', { ns: 'common' })}:</b> {t('vineet_phone', { ns: 'common' })}<br />
+        <b>{t('address', { ns: 'common' })}:</b> {t('vineet_location', { ns: 'common' })}
+        {t('HunarBazaar_Internet_Private_Limited', { ns: 'common' })}
+      </p>
     </div>
   );
 
@@ -379,10 +377,12 @@ const TermsOfService = () => {
       </h4>
       <p>{t('seller_section16_content', { ns: 'terms' })}</p>
       <p>
-  {t('seller_section16_email_label', { ns: 'terms' })}: vp1246194@gmail.com<br />
-  {t('seller_section16_phone_label', { ns: 'terms' })}: +91-78190-XXXXX<br />
-  {t('seller_section16_address_label', { ns: 'terms' })}: Haldwani, India
-</p>
+        <b>{t('name', { ns: 'common' })}:</b> {t('khajan', { ns: 'common' })}<br />
+        <b>{t('email', { ns: 'common' })}:</b> <a href="mailto:tanujbhatt8279@gmail.com" className='font-bold text-blue-500 cursor-pointer'>{t('khajan_email', { ns: 'common' })}</a><br />
+        <b>{t('phone', { ns: 'common' })}:</b> {t('khajan_phone', { ns: 'common' })}<br />
+        <b>{t('address', { ns: 'common' })}:</b> {t('khajan_location', { ns: 'common' })}
+        {t('HunarBazaar_Internet_Private_Limited', { ns: 'common' })}
+      </p>
 
       <br />
     </div>
@@ -397,15 +397,12 @@ const TermsOfService = () => {
       
       <div className="relative w-full max-w-[1200px] bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] h-full mx-auto my-10 py-0 px-10 md:py-10 text-justify">
         <div className="relative flex items-center mb-6 w-full">
-          <h1 className="absolute left-1/2 -translate-x-1/2 text-4xl text-green-900 text-center" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }}>
+          <h1 className="font-bold absolute left-1/2 -translate-x-1/2 text-4xl text-green-900 text-center" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }}>
             {t('terms_of_service', { ns: 'common' })}
           </h1>
-          <div className="ml-auto">
-            <select 
-              className="p-2.5 border border-gray-300 rounded" 
-              onChange={(e) => i18n.changeLanguage(e.target.value)} 
-              value={i18n.language}
-            >
+          <div className="flex flex-row items-center justify-center gap-2 ml-auto">
+            <Globe className="w-5 h-5 text-gray-500" />
+            <select className="p-2.5 border border-gray-300 rounded" onChange={(e) => i18n.changeLanguage(e.target.value)} value={i18n.language}>
               <option value="en">English</option>
               <option value="hi">हिंदी</option>
             </select>

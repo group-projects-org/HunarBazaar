@@ -7,5 +7,21 @@
   "terms_of_service": "Terms of Service",
   "terms_of_use": "Terms of Use",
   "contact_information": "Contact Information",
-  "last_updated": "Last Updated"
+  "last_updated": "Last Updated",
+  "cookies": "Cookies",
+  "name": "Name",
+  "khajan": "Mr. Khajan Bhatt",
+  "vineet": "Mr. Vineet Pandey",
+  "designation": "Designation",
+  "founder": "Founder & CEO",
+  "co_founder": "Co-Founder & CTO",
+  "khajan_location": "Haldwani, Uttarakhand, India, 263139",
+  "vineet_location": "Haldwani, Uttarakhand, India, 263139",
+  "khajan_phone": "+91-82795 71252",
+  "vineet_phone": "+91-78190 66874",
+  "khajan_email": "tanujbhatt8279@gmail.com",
+  "vineet_email": "vp1246194@gmail.com",
+  "email": "E-mail",
+  "phone": "Phone No.",
+  "address": "Address"
 }

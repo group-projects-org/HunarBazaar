@@ -265,3 +265,14 @@ const About = () => {
 };
 
 export default About;
+
+// const links = [
+//     ["Privacy Policy", "https://www.linkedin.com/in/khajanbhatt/", "https://cdn-icons-png.flaticon.com/512/174/174857.png"],
+//     ["Khajan38", "https://github.com/Khajan38/", "https://cdn-icons-png.flaticon.com/512/733/733553.png"],
+//     ["Khajan Bhatt", "https://khajan38.vercel.app/", "https://cdn-icons-png.flaticon.com/512/841/841364.png"],
+//     ["tanujbhatt8279@gmail.com", "mailto:tanujbhatt8279@gmail.com", "https://cdn-icons-png.flaticon.com/512/732/732200.png"],
+  // ];
+
+  // <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="text-[#45a049] hover:text-black transition-colors duration-300 no-underline text-[0.7rem] md:text-[0.9rem] flex items-center justify-start wrap-break-all " style={{marginBottom: "7px", paddingLeft: "20%", fontFamily: "Poppins, sans-serif"}} >
+  //             <img className="w-[15px] h-[15px] md:w-[25px] md:h-[25px]" style={{margin: "0px 8px"}}src={icon} alt={name} /> {name} 
+  //           </a>

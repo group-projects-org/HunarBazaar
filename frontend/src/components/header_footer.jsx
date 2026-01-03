@@ -131,10 +131,10 @@ const Footer = () => {
   const [userEmail, setUserEmail] = useState(null);
   const [subscribed, setSubscribed] = useState(false);
   const links = [
-    ["khajan_bhatt", "https://www.linkedin.com/in/khajanbhatt/", "https://cdn-icons-png.flaticon.com/512/174/174857.png"],
-    ["Khajan38", "https://github.com/Khajan38/", "https://cdn-icons-png.flaticon.com/512/733/733553.png"],
-    ["Khajan Bhatt", "https://khajan38.vercel.app/", "https://cdn-icons-png.flaticon.com/512/841/841364.png"],
+    ["Privacy Policy", `https://hunar-bazaar-theta.vercel.app/PrivacyPolicy/`, "https://cdn-icons-png.flaticon.com/512/3064/3064197.png"],
+    ["Terms of Serivce", "https://hunar-bazaar-theta.vercel.app/TermsOfService/", "https://cdn-icons-png.flaticon.com/512/942/942748.png"],
     ["tanujbhatt8279@gmail.com", "mailto:tanujbhatt8279@gmail.com", "https://cdn-icons-png.flaticon.com/512/732/732200.png"],
+    ["vp1246194@gmail.com", "mailto:vp1246194@gmail.com", "https://cdn-icons-png.flaticon.com/512/732/732200.png"]
   ];
   useEffect(() => {
     const fetchUserData = async () => {

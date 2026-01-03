@@ -1,13 +1,11 @@
 {
-  "welcome_message": "Welcome to our website!",
-  "logout": "Logout",
-  "login": "Login",
-  "signup": "Sign Up",
   "disclaimer": "Disclaimer",
   "brand": "हुनरBazaar",
-  "HunarBazaar": "हुनरBazaar",
-  "website": "website",
   "HunarBazaar_Internet_Private_Limited": "हुनरBazaar Internet Private Limited",
+  "website": "Website",
   "privacy_policy": "Privacy Policy",
-  "terms_of_use": "Terms of Use"
+  "terms_of_service": "Terms of Service",
+  "terms_of_use": "Terms of Use",
+  "contact_information": "Contact Information",
+  "last_updated": "Last Updated"
 }

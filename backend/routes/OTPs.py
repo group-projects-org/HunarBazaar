@@ -10,6 +10,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 otp_router = APIRouter()
 REDIS_REST_URL=os.getenv("REDIS_REST_URL")
 RECAPTCHA_SECRET_KEY=os.getenv("RECAPTCHA_SECRET_KEY")
+MAILJET_API_KEY=os.getenv("MAILJET_API_KEY")
+MAILJET_API_SECRET=os.getenv("MAILJET_API_SECRET")
 redis_client = redis.Redis.from_url(REDIS_REST_URL, decode_responses=True)
 
 def generate_otp():
@@ -18,8 +20,9 @@ def random_string(length=5):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def send_email(receiver_email: str, otp_code: str) -> bool:
-    resend_api_key = os.getenv("RESEND_API_KEY")
-    sender_email = "हुनरBazaar <no-reply@resend.dev>"
+    sender_email = "developertanuj38@gmail.com"
+    sender_name = "हुनरBazaar"
+
     html_content = f"""
     <html>
       <head>
@@ -58,18 +61,19 @@ def send_email(receiver_email: str, otp_code: str) -> bool:
     </html>
     """
 
+    payload = {"Messages": [{
+        "From": {"Email": sender_email, "Name": sender_name},
+        "To": [{"Email": receiver_email}],
+        "Subject": "हुनरBazaar OTP Verification",
+        "HTMLPart": html_content
+    }]}
+
     try:
-        response = requests.post(
-            "https://api.resend.com/emails",
-            headers={"Authorization": f"Bearer {resend_api_key}", "Content-Type": "application/json"},
-            json={"from": sender_email, "to": [receiver_email], "subject": "हुनरBazaar OTP Verification", "html": html_content},
-            timeout=10
-        )
+        response = requests.post("https://api.mailjet.com/v3.1/send", auth=(MAILJET_API_KEY, MAILJET_API_SECRET), json=payload, timeout=10)
         response.raise_for_status()
         return True
-
     except Exception as e:
-        print("Resend Email Error:", e)
+        print("Mailjet Email Error:", e)
         return False
 
 @otp_router.post("/captcha_otp/validate")

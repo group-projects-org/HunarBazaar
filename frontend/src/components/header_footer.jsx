@@ -11,6 +11,7 @@ const Header = ({ userType }) => {
   const loggedIn = !!localStorage.getItem("username");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const [picture, setPicture] = useState('/assets/User.jpg');
   const userTabs = [
     ["/Home", FaHome, "Home"],
     ["/About/users", FaInfoCircle, "About"],
@@ -26,6 +27,14 @@ const Header = ({ userType }) => {
     ["/seller/Analytics", DollarSign, " Analytics"],
     ["/seller/Invoices", FaClipboardList, "Invoices"]
   ]; 
+  useEffect(() => {
+    axios.get(`${BASE_URL}/api/userData`, {
+      withCredentials: true,
+    }).then((res) => {
+      const userData = res.data.data;
+      if (userData && userData.picture){setPicture(userData.picture);}
+    });
+  }, []);
   const handleLogoutClick = async () => {
     setError("Logging Out...");
     const rawCart = localStorage.getItem("cart");
@@ -49,7 +58,7 @@ const Header = ({ userType }) => {
     } catch (error) {
       console.error('Error during logout:', error);
       setError("Error during Logout");
-    } finally { setError(null); navigate('/');}
+    } finally { setError(null); setPicture('/assets/User.jpg'); navigate('/');}
   };
 
   useEffect(() => {
@@ -84,7 +93,7 @@ const Header = ({ userType }) => {
           <span className="overflow-hidden hover:text-[#333]" style={{ fontFamily: "Bricolage Grotesque, sans-serif" }}>
             {loggedIn? localStorage.getItem("username") : <button onClick={() => navigate('/Login')} className='font-bold hover:underline cursor-pointer py-4 text-[14px]' style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>Hello, Login</button>}
           </span>
-          <img src={'/assets/User.jpg'} alt="User" className="w-8 h-8 rounded-[50%] bg-[#2563eb] text-white flex items-center justify-center font-medium" />
+          <img src={picture} alt="User" className="w-8 h-8 rounded-[50%] bg-transparent text-white flex items-center justify-center font-medium" />
           {dropdownVisible && (
           <div className="absolute top-full whitespace-nowrap right-0 bg-white shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-sm z-10 p-2">
             <button className="w-full block text-left cursor-pointer hover:bg-[#e4e4e4] rounded-sm bg-transparent border-none disabled:hover:bg-transparent disabled:cursor-not-allowed disabled={!loggedIn} px-4 py-2" disabled={!loggedIn}>View Profile </button>

@@ -1,6 +1,7 @@
-import uuid
+import os, json, base64, urllib.parse
+import uuid, requests
 from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
 
 from backend.JWT import get_current_user
@@ -17,6 +18,10 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 user_route = APIRouter()
+GOOGLE_CLIENT_ID=os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET=os.getenv("GOOGLE_CLIENT_SECRET")
+MY_URL=os.getenv("MY_URI")
+BASE_URL=os.getenv("BASE_URI")
 
 @user_route.post("/check-username")
 async def check_username(request: Request):
@@ -32,6 +37,14 @@ async def check_username(request: Request):
     except Exception as e:
         print("Error checking username:", e)
         return JSONResponse({"error": "Server error"}, status_code=500)
+
+async def generate_unique_username(collection, base_username):
+    username = base_username
+    suffix = 1
+    while await collection.find_one({"username": username}):
+        username = f"{base_username}_{suffix}"
+        suffix += 1
+    return username
 
 @user_route.get("/verify-token")
 def verify_token(request: Request):
@@ -56,9 +69,11 @@ async def check_login(request: Request):
     if not username or not password or not userType:
         return JSONResponse(content={'error': 'Missing required fields'}, status_code=400)
     collection = db[userType]
-    document = await collection.find_one({"username": username})
+    document = await collection.find_one({"username": username, "password": {"$ne": None}})
     if not document:
         return JSONResponse(content={"error": "User Not Found"}, status_code=401)
+    if document["password"] is None:
+        raise HTTPException(status_code=400, detail="This account uses Google Login")
     if not check_password_hash(document.get("password"), password):
         return JSONResponse(content={"error": "Password is Incorrect"}, status_code=401)
     id_key = "user_id" if userType in ["users", "sellers"] else "agent_id"
@@ -77,7 +92,7 @@ async def login(request: Request):
     document = await collection.find_one({id_key: user_id})
 
     user_id = document.get(id_key)
-    token_data = {"user_id": user_id, "username": document["username"], "email": document["email"], "phone": document["phone"], "userType": userType, }
+    token_data = {"user_id": user_id, "username": document["username"], "email": document["email"], "phone": document["phone"], "userType": userType}
     access_token = create_access_token(data=token_data)
     response = JSONResponse(content={"message": "Login successful", "username": document["username"], "cart": document.get("cart", [])})
     response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="None")
@@ -105,6 +120,7 @@ async def register(user: UserDetails):
     user_data = user.dict()
     user_data["user_id"] = str(uuid.uuid4())
     user_data["password"] = generate_password_hash(user_data["password"])
+    user_data["picture"] = "https://github.com/group-projects-org/HunarBazaar/blob/master/frontend/public/assets/User.jpg"
     user_data.pop("userType", None)
 
     await collection.insert_one(user_data)
@@ -128,3 +144,43 @@ async def logout(request: Request):
     except Exception as e:
         print("Logout error:", e)
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+@user_route.get("/auth/google/callback")
+async def google_callback(request: Request):
+    state = request.query_params.get("state")
+    if not state: raise HTTPException(400, "Missing state")
+    state_json = urllib.parse.unquote(base64.b64decode(state).decode())
+    state_data = json.loads(state_json)
+    code = request.query_params.get("code")
+    user_type = state_data["userType"]
+    if not code: raise HTTPException(status_code=400, detail="Authorization code missing")
+
+    collection = db[user_type]
+    token_res = requests.post("https://oauth2.googleapis.com/token", data={"client_id": GOOGLE_CLIENT_ID, "client_secret": GOOGLE_CLIENT_SECRET, "code": code, "grant_type": "authorization_code", "redirect_uri": f"{MY_URL}/api/auth/google/callback"} ).json()
+    access_token = token_res.get("access_token")
+    if not access_token:raise HTTPException(status_code=400, detail="Failed to obtain access token")
+
+    user_info = requests.get("https://www.googleapis.com/oauth2/v2/userinfo", headers={"Authorization": f"Bearer {access_token}"}
+    ).json()
+    email = user_info.get("email")
+    google_id = user_info.get("id")
+    picture = user_info.get("picture")
+    if not email or not google_id: raise HTTPException(status_code=400, detail="Invalid Google user data")
+    raw_username = user_info.get("name") or "user"
+    username = await generate_unique_username(collection, raw_username)
+    user = await collection.find_one({"email": email})
+
+    if not user:
+        user = {"user_id": str(uuid.uuid4()), "username": username, "email": email, "google_id": google_id, "password": None, "picture": picture}
+        await collection.insert_one(user)
+    elif user.get("password") is not None and not user.get("google_id"):
+        update_fields = {"google_id": google_id}
+        if not user.get("picture"): update_fields["picture"] = picture
+        await collection.update_one({"email": email}, {"$set": update_fields})
+
+    token_data = {"user_id": user["user_id"], "username": user["username"], "email": user["email"], "phone": user.get("phone"), "userType": user_type}
+
+    access_token = create_access_token(data=token_data)
+    response = RedirectResponse(url=f"{BASE_URL}/Login")
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="None")
+    return response

@@ -4,6 +4,7 @@ import './CSS/login.css';
 import { useNavigate } from 'react-router-dom';
 import { CodeCaptcha, Recaptcha } from './Captchas';
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 axios.defaults.withCredentials = true;
 
 const LoginRegister = () => {
@@ -254,10 +255,22 @@ const LoginRegister = () => {
               <div className={`slider ${formData.userType === 'agents'? 'right': formData.userType === 'users'? 'left': 'middle'} loginS`}></div>
             </div>
           </form>
-          <div className={`w-full h-full text-[#ccc] flex flex-col justify-center items-center`}>
-            <p style={{fontFamily: "'Montserrat', 'Poppins', sans-serif", marginBottom: '8px'}}>Don't have an account?</p>
-            <button className="btn h-[46px] border-2 border-white shadow-none" style={{width:"30%"}} onClick={handleRegisterClick}>Register</button>
-          </div>
+          <button className='btn flex flex-row justify-center items-center gap-3 mb-3' style={{width:"260px", borderRadius:"20px"}} onClick={() => {
+            const statePayload = { csrf: crypto.randomUUID(), userType: formData.userType };
+            const state = btoa(encodeURIComponent(JSON.stringify(statePayload)));
+            const params = new URLSearchParams({
+              client_id: GOOGLE_CLIENT_ID,
+              redirect_uri: `${BASE_URL}/api/auth/google/callback`,
+              response_type: "code",
+              scope: "openid email profile",
+              state,
+              prompt: "consent",
+              access_type: "online",
+            });  window.location.href =`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;}}>
+            <img className='h-6 w-6' src="https://img.icons8.com/color/48/google-logo.png" alt="Google" />
+            <span style={{fontFamily: "Montserrat"}}>Continue with Google</span> 
+          </button>
+          <button className='text-[15px] underline mb-2.5 cursor-pointer text-white' style={{fontFamily: "Montserrat"}} onClick={handleRegisterClick}>Don't have an account? Register</button>
         </>):(<>
           <h1 className='text-[40px] font-bold text-[#BFB28C] mb-0 mt-5 mx-0' style={{fontFamily:"Great Vibes, cursive"}}>{forgotPassword? "Forgot Password" : "Two-Factor Authentication"}</h1>
           <span className='mb-10 mt-0' style={{fontFamily: "'Montserrat', 'Poppins', sans-serif"}}>You Security, Our Responsibility</span>
@@ -303,12 +316,12 @@ const LoginRegister = () => {
       <div className={`absolute top-0 left-0 w-full sm:w-[40%] h-full overflow-hidden bg-black/50 backdrop-blur-sm flex flex-col justify-center items-center text-[#ccc] text-center transition-all ease-in-out duration-600 ${isActive ? 'translate-x-0 transform delay-100 opacity-100 z-20' : 'translate-x-[50%] transform opacity-0 pointer-events-none'}`} style={{ padding: '40px' }}>
         <div className="flex lg:hidden justify-center items-center gap-4">
           <img className="bg-[#BCAA99] rounded-[50%]" style={{height:"100px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
-          <div className='flex flex-col justify-center items-end gap-0' style={{margin:"20px 0"}}>
+          <div className='flex flex-col justify-center items-end gap-0 mx-5'>
             <h1 className='text-[40px] sm:text-[50px] font-bold text-[#BCAA99]' style={{ fontFamily:"Montserrat, Poppins, sans-serif"}}>हुनरBazaar</h1>
             <p className='text-[12px] font-bold text-[#BCAA99] uppercase' style={{fontFamily:"Montserrat, Poppins, sans-serif"}}>Luxury, Crafted by Talent</p>
           </div>
         </div>
-        <h1 className='text-[50px] font-bold text-[#BFB28C]' style={{margin:"20px 0", fontFamily:"Great Vibes, cursive"}}>Registration</h1>
+        <h1 className='text-[50px] font-bold text-[#BFB28C] mx-auto' style={{fontFamily:"Great Vibes, cursive"}}>Registration</h1>
         <form className="w-full" onSubmit={handleRegisterSubmit}>
           <div className="input-box">
             <input type="text" placeholder="Username" name="username" value={formData.username} onChange={handleChange} required />
@@ -342,11 +355,22 @@ const LoginRegister = () => {
             <div className={`slider ${formData.userType === 'sellers'? 'right': 'left'} registerS`}></div>
           </div>
         </form>
-
-        <div className={`w-full h-full text-[#ccc] flex flex-col justify-center items-center z-2 ${isActive? 'left-0 delay-1200' : 'left-[-50%] delay-600'}`}>
-          <p style={{fontFamily: "'Montserrat', 'Poppins', sans-serif", marginBottom: '8px'}}>Already have an account?</p>
-          <button className="btn w-[10%] h-[46px] border-2 border-white shadow-none" onClick={handleLoginClick}>Login</button>
-        </div>
+        <button className='btn flex flex-row justify-center items-center gap-3 mb-3' style={{width:"260px", borderRadius:"20px"}} onClick={() => {
+          const statePayload = { csrf: crypto.randomUUID(), userType: formData.userType };
+          const state = btoa(encodeURIComponent(JSON.stringify(statePayload)));
+          const params = new URLSearchParams({
+            client_id: GOOGLE_CLIENT_ID,
+            redirect_uri: `${BASE_URL}/api/auth/google/callback`,
+            response_type: "code",
+            scope: "openid email profile",
+            state,
+            prompt: "consent",
+            access_type: "online",
+          });  window.location.href =`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;}}>
+          <img className='h-6 w-6' src="https://img.icons8.com/color/48/google-logo.png" alt="Google" />
+          <span style={{fontFamily: "Montserrat"}}>Continue with Google</span> 
+        </button>
+        <button className='text-[15px] underline mb-2.5 cursor-pointer text-white' style={{fontFamily: "Montserrat"}} onClick={handleLoginClick}>Already have an account? Login</button>
       </div>
     </div>
     </div>

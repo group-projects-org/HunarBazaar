@@ -103,7 +103,17 @@ const Header = ({ userType }) => {
           <img src={picture} alt="User" className="w-8 h-8 rounded-[50%] bg-transparent text-white flex items-center justify-center font-medium" />
           {dropdownVisible && (
           <div className="absolute top-full whitespace-nowrap right-0 bg-white shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-sm z-10 p-2">
-            <button className="w-full block text-left cursor-pointer hover:bg-[#e4e4e4] rounded-sm bg-transparent border-none disabled:hover:bg-transparent disabled:cursor-not-allowed disabled={!loggedIn} px-4 py-2" disabled={!loggedIn}>View Profile </button>
+             <button
+  onClick={() => {
+    setDropdownVisible(false);
+    navigate("/profile");
+  }}
+  className="w-full block text-left cursor-pointer hover:bg-[#e4e4e4] rounded-sm px-4 py-2"
+  disabled={!loggedIn}
+>
+  View Profile
+</button>
+
             <button onClick={handleLogoutClick} className="w-full block text-left cursor-pointer rounded-sm hover:bg-[#e4e4e4] bg-transparent border-none disabled:hover:bg-transparent disabled:cursor-not-allowed px-4 py-2" disabled={!loggedIn}> Logout </button>
           </div> )}
         </div>
@@ -160,7 +170,7 @@ const Footer = () => {
         }); const userData = response.data.data;
         setUserEmail(userData.email || "");
         setSubscribed(userData.subscribed || false);
-      } catch (error) { console.error("❌ Error fetching user data:", error);}
+      } catch (error) { console.error(" Error fetching user data:", error);}
     }; fetchUserData();
   }, []);
 
@@ -170,7 +180,7 @@ const Footer = () => {
       await axios.post(`${BASE_URL}/api/subscribe`, { subscribed }, {
         withCredentials: true,
       }); setSubscribed(!subscribed);
-    } catch (error) { console.error("❌ Error fetching user data:", error);}
+    } catch (error) { console.error("Error fetching user data:", error);}
   }
 
   return (

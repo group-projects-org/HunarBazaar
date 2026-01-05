@@ -12,6 +12,7 @@ import ProductDetail from './components/productDetail.jsx'
 import PrivacyPolicy from './components/PrivacyPolicy.jsx';
 import TermsOfService from './components/TermsOfService.jsx';
 import About from './components/About.jsx';
+import Profile from "./components/Users/Profile";
 
 function App() {  
   return (
@@ -36,6 +37,7 @@ function App() {
 
       <Route path="/seller/Home" element={<SellerHome />} />
       <Route path="/seller/Products" element={<ProductsListed />} />
+      <Route path="/profile" element={<Profile />} />
 
     </Routes>
   );

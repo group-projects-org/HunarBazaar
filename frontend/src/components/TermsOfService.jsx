@@ -9,7 +9,7 @@ const TermsOfService = () => {
 
   const BuyerTerms = () => (
     <div>
-      <h3 className='font-bold text-2xl text-green-900 underline my-4' style={{ fontFamily: "Playfair" }}>{t('buyer_terms_heading', { ns: 'terms' })}</h3>
+      <h3 className='font-bold text-2xl text-green-900 underline my-4 uppercase' style={{ fontFamily: "Montserrat" }}>{t('buyer_terms_heading', { ns: 'terms' })}</h3>
 
       <h4 className='font-bold text-lg text-green-900 mt-4 mb-2'>1. {t('buyer_section1_title', { ns: 'terms' })}</h4>
       <p>{t('buyer_section1_content', { ns: 'terms' })}</p>
@@ -173,9 +173,7 @@ const TermsOfService = () => {
 
   const SellerTerms = () => (
     <div>
-      <h3 className='font-bold text-2xl text-green-900 underline my-4 mt-8' style={{ fontFamily: "Playfair" }}>
-        {t('seller_terms_heading', { ns: 'terms' })}
-      </h3>
+      <h3 className='font-bold text-2xl text-green-900 underline my-4 mt-8 uppercase' style={{ fontFamily: "Montserrat" }}> {t('seller_terms_heading', { ns: 'terms' })}</h3>
   
       <h4 className='font-bold text-lg text-green-900 mt-4 mb-2'>
         1. {t('seller_section1_title', { ns: 'terms' })}
@@ -396,11 +394,12 @@ const TermsOfService = () => {
       <Header userType={user_type} />
       
       <div className="relative w-full max-w-[1200px] bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] h-full mx-auto my-10 py-0 px-10 md:py-10 text-justify">
-        <div className="relative flex items-center mb-6 w-full">
-          <h1 className="font-bold absolute left-1/2 -translate-x-1/2 text-4xl text-green-900 text-center" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }}>
+
+        <div className="relative flex flex-col md:flex-row items-center mb-6 w-full">
+          <h1 className="font-bold md:absolute md:left-1/2 md:-translate-x-1/2 text-4xl text-green-900 text-center underline" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }}>
             {t('terms_of_service', { ns: 'common' })}
           </h1>
-          <div className="flex flex-row items-center justify-center gap-2 ml-auto">
+          <div className="flex flex-row items-center justify-center gap-2 ml-auto mt-2 md:mt-0">
             <Globe className="w-5 h-5 text-gray-500" />
             <select className="p-2.5 border border-gray-300 rounded" onChange={(e) => i18n.changeLanguage(e.target.value)} value={i18n.language}>
               <option value="en">English</option>

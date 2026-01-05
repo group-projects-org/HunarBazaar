@@ -7,6 +7,10 @@ const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const Header = ({ userType }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [username, setUserName] = useState(() => {
+    const fullName = localStorage.getItem("username") || "";
+    return fullName.split(" ")[0];
+  });
   const [error, setError] = useState(null);
   const loggedIn = !!localStorage.getItem("username");
   const dropdownRef = useRef(null);
@@ -33,6 +37,9 @@ const Header = ({ userType }) => {
     }).then((res) => {
       const userData = res.data.data;
       if (userData && userData.picture){setPicture(userData.picture);}
+    }).catch(() => {
+      localStorage.removeItem("username");
+      setUserName("");
     });
   }, []);
   const handleLogoutClick = async () => {
@@ -91,7 +98,7 @@ const Header = ({ userType }) => {
 
         <div ref={dropdownRef} className="flex items-center gap-4 text-black relative cursor-pointer" style={{marginRight: "15px"}} onClick={() => setDropdownVisible(!dropdownVisible)} >
           <span className="overflow-hidden hover:text-[#333]" style={{ fontFamily: "Bricolage Grotesque, sans-serif" }}>
-            {loggedIn? localStorage.getItem("username") : <button onClick={() => navigate('/Login')} className='font-bold hover:underline cursor-pointer py-4 text-[14px]' style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>Hello, Login</button>}
+            {loggedIn? username: <button onClick={() => navigate('/Login')} className='font-bold hover:underline cursor-pointer py-4 text-[14px]' style={{fontFamily: "Montserrat, Poppins, sans-serif"}}>Hello, Login</button>}
           </span>
           <img src={picture} alt="User" className="w-8 h-8 rounded-[50%] bg-transparent text-white flex items-center justify-center font-medium" />
           {dropdownVisible && (

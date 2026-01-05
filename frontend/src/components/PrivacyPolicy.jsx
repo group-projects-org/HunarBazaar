@@ -9,9 +9,9 @@ const PrivacyPolicy = () => {
   return (<div className='relative h-full w-full overflow-hidden lg:overflow-visible'>
     <Header userType={user_type} />
     <div className="relative w-full max-w-[1200px] bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] h-full mx-auto my-10 py-0 px-10 md:py-10 text-justify">
-      <div className="relative flex items-center mb-6 w-full">
-        <h1 className="font-bold absolute left-1/2 -translate-x-1/2 text-4xl text-green-900 text-center" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }}> {t('privacy_policy', { ns: 'common' })} </h1>
-        <div className="flex flex-row items-center justify-center gap-2 ml-auto">
+      <div className="relative flex flex-col md:flex-row items-center mb-6 w-full">
+        <h1 className="font-bold md:absolute md:left-1/2 md:-translate-x-1/2 text-4xl text-green-900 text-center underline" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }}> {t('privacy_policy', { ns: 'common' })} </h1>
+        <div className="flex flex-row items-center justify-center gap-2 ml-auto mt-2 md:mt-0">
           <Globe className="w-5 h-5 text-gray-500" />
           <select className="p-2.5 border border-gray-300 rounded" onChange={(e) => i18n.changeLanguage(e.target.value) } value={i18n.language}>
             <option value="en">English</option>
@@ -28,7 +28,7 @@ const PrivacyPolicy = () => {
 
       <p>{t('second_paragraph', { ns: 'privacy' })}<a href="/PrivacyPolicy" className='font-bold text-blue-500 cursor-pointer'>{t('privacy_policy', { ns: 'common' })}</a>, <a href="/TermsOfService" className='font-bold text-blue-500 cursor-pointer'>{t('terms_of_use', { ns: 'common' })}</a>{t('second_paragraph2', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('third_heading', { ns: 'privacy' })}:</h3>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('third_heading', { ns: 'privacy' })}:</h3>
 
       <p>{t('third_paragraph', { ns: 'privacy' })}</p> <br/>
       <p>{t('third_paragraph2', { ns: 'privacy' })}</p> <br/>
@@ -38,7 +38,7 @@ const PrivacyPolicy = () => {
       <p>{t('third_paragraph6', { ns: 'privacy' })}</p> <br/>
       <p>{t('third_paragraph7', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('fourth_heading', { ns: 'privacy' })}:</h3>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('fourth_heading', { ns: 'privacy' })}:</h3>
 
       <p>{t('fourth_paragraph', { ns: 'privacy' })}</p> <br/>
       <p>{t('fourth_paragraph2', { ns: 'privacy' })}</p> <br/>
@@ -51,11 +51,11 @@ const PrivacyPolicy = () => {
       <p>{t('fourth_paragraph3', { ns: 'privacy' })}</p> <br/>
       <p>{t('fourth_paragraph4', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('cookies', { ns: 'common' })}:</h3>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('cookies', { ns: 'common' })}:</h3>
 
-      <p>{t('fifth_paragraph', { ns: 'privacy' })}<a href="https://www.google.com/intl/en/policies/privacy/" target='_blank' className='text-blue-500 underline cursor-pointer'>https://www.google.com/intl/en/policies/privacy/</a>{t('fifth_paragraph2', { ns: 'privacy' })}<a href="https://tools.google.com/dlpage/gaoptout" target='_blank' className='text-blue-500 underline cursor-pointer'>https://tools.google.com/dlpage/gaoptout</a>{t('fifth_paragraph3', { ns: 'privacy' })}</p>
+      <p>{t('fifth_paragraph', { ns: 'privacy' })}<a href="https://www.google.com/intl/en/policies/privacy/" target='_blank' className='text-blue-500 underline cursor-pointer wrap-break-word'>https://www.google.com/intl/en/policies/privacy/</a>{t('fifth_paragraph2', { ns: 'privacy' })}<a href="https://tools.google.com/dlpage/gaoptout" target='_blank' className='text-blue-500 underline cursor-pointer wrap-break-word'>https://tools.google.com/dlpage/gaoptout</a>{t('fifth_paragraph3', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('sixth_heading', { ns: 'privacy' })}:</h3>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('sixth_heading', { ns: 'privacy' })}:</h3>
 
       <p>{t('sixth_paragraph', { ns: 'privacy' })}</p> <br/>
       <p>{t('sixth_paragraph2', { ns: 'privacy' })}</p> <br/>
@@ -63,31 +63,31 @@ const PrivacyPolicy = () => {
       <p>{t('sixth_paragraph4', { ns: 'privacy' })}</p> <br/>
       <p>{t('sixth_paragraph5', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('seventh_heading', { ns: 'privacy' })}:</h3> <p>{t('seventh_paragraph', { ns: 'privacy' })}</p>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('seventh_heading', { ns: 'privacy' })}:</h3> <p>{t('seventh_paragraph', { ns: 'privacy' })}</p>
       
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('eighth_heading', { ns: 'privacy' })}:</h3> <p>{t('eighth_paragraph', { ns: 'privacy' })}</p>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('eighth_heading', { ns: 'privacy' })}:</h3> <p>{t('eighth_paragraph', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('ninth_heading', { ns: 'privacy' })}:</h3> <p>{t('ninth_paragraph', { ns: 'privacy' })}</p>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('ninth_heading', { ns: 'privacy' })}:</h3> <p>{t('ninth_paragraph', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('tenth_heading', { ns: 'privacy' })}:</h3> <p>{t('tenth_paragraph', { ns: 'privacy' })}</p>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('tenth_heading', { ns: 'privacy' })}:</h3> <p>{t('tenth_paragraph', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('eleventh_heading', { ns: 'privacy' })}:</h3> <p>{t('eleventh_paragraph', { ns: 'privacy' })}</p>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('eleventh_heading', { ns: 'privacy' })}:</h3> <p>{t('eleventh_paragraph', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('twelfth_heading', { ns: 'privacy' })}:</h3> <p>{t('twelfth_paragraph', { ns: 'privacy' })}</p>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('twelfth_heading', { ns: 'privacy' })}:</h3> <p>{t('twelfth_paragraph', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('thirteenth_heading', { ns: 'privacy' })}:</h3>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('thirteenth_heading', { ns: 'privacy' })}:</h3>
 
       <p>{t('thirteenth_paragraph', { ns: 'privacy' })}</p> <br/>
       <p>{t('thirteenth_paragraph2', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('fourteenth_heading', { ns: 'privacy' })}:</h3>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('fourteenth_heading', { ns: 'privacy' })}:</h3>
 
       <p>{t('fourteenth_paragraph', { ns: 'privacy' })}</p> <br/>
       <p>{t('fourteenth_paragraph2', { ns: 'privacy' })}</p>
 
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('fifteenth_heading', { ns: 'privacy' })}:</h3> <p>{t('fifteenth_paragraph', { ns: 'privacy' })}</p>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('fifteenth_heading', { ns: 'privacy' })}:</h3> <p>{t('fifteenth_paragraph', { ns: 'privacy' })}</p>
       
-      <h3 className='font-bold text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Playfair"}}>{t('sixteenth_heading', { ns: 'privacy' })}:</h3>
+      <h3 className='font-bold text-left text-xl text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('sixteenth_heading', { ns: 'privacy' })}:</h3>
 
       <p>{t('fourteenth_paragraph', { ns: 'privacy' })}</p> <br/>
       <p><b>{t('name', { ns: 'common' })}:</b> {t('khajan', { ns: 'common' })}</p>

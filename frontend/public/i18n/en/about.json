@@ -1,7 +1,4 @@
 {
-  "page_title": "About Us",
-  "hero_title": "About हुनरBazaar",
-  "hero_tagline": "Craftsmanship You Can Feel, Luxury You Can Wear",
   "intro_title": "Who We Are",
   "intro_text": "हुनरBazaar is a premium e-commerce platform dedicated to bringing you the finest collection of clothing and apparel. We believe that fashion is not just about wearing clothes—it's about expressing your identity, celebrating craftsmanship, and experiencing luxury that feels personal. Our carefully curated collections blend traditional artistry with modern style, ensuring every piece tells a story.",
   
@@ -12,33 +9,33 @@
   "vision_text": "To become the leading platform for authentic, handcrafted fashion in India and beyond. We envision a world where technology empowers artisans, where customers can discover unique pieces with rich heritage, and where fashion e-commerce sets new standards for quality, transparency, and customer satisfaction.",
   
   "values_title": "Our Core Values",
-  "value1_title": "Quality First",
-  "value1_text": "We never compromise on the quality of our products. Every item undergoes rigorous quality checks to ensure it meets our high standards.",
-  "value2_title": "Authenticity",
-  "value2_text": "We celebrate genuine craftsmanship and traditional techniques, ensuring every product is authentic and ethically sourced.",
-  "value3_title": "Customer Delight",
-  "value3_text": "Your satisfaction is our priority. We're committed to providing exceptional service and a seamless shopping experience.",
-  "value4_title": "Innovation",
-  "value4_text": "We leverage cutting-edge technology to make traditional fashion accessible, combining heritage with modern convenience.",
-  
+
+  "value0_title": "True Excellence",
+  "value0_text": "We uphold the highest standards of quality in everything we create. Every piece is meticulously crafted and rigorously inspected to ensure it reflects the refinement, durability, and luxury our brand proudly represents.",
+
+  "value1_title": "True to Our Roots",
+  "value1_text": "We honor genuine craftsmanship and time-honored traditions, preserving cultural heritage while ensuring each creation is authentic, ethically sourced, and thoughtfully designed for the modern connoisseur.",
+
+  "value2_title": "Elevated Experience",
+  "value2_text": "Your satisfaction defines our success. From personalized support to seamless discovery and delivery, we curate a refined shopping journey that feels effortless, engaging, and distinctly rich and premium branded with Confidence.",
+
+  "value3_title": "Heritage, Reimagined",
+  "value3_text": "By blending cutting-edge technology with traditional artistry, we transform heritage fashion into a modern luxury — accessible, intelligent, and beautifully attuned to today’s lifestyle.",
+
+  "value4_title": "Luxury for Everyone",
+  "value4_text": "We believe true luxury is inclusive. हुनरBazaar unites local artisans and established brands on one elegant platform, ensuring every creator and customer is celebrated equally.",
+
+  "value5_title": "Confidence",
+  "value5_text": "Trust is woven into our foundation. With encrypted delivery systems, secure transactions, and transparent practices, we ensure every interaction is protected, reliable, and worthy of your confidence.",
+
   "contact_title": "Get In Touch",
   "contact_email_label": "Email",
   "contact_address_label": "Address",
   "contact_address": "Haldwani , India",
   
-  "team_title": "Meet Our Developers",
-  "team_subtitle": "The passionate individuals building हुनरBazaar",
+  "team_title": "Those Behind HunarBazaar",
+  "team_subtitle": "Designing Experiences with Purpose and Precision",
   
-  "dev1_name": "Vineet Pandey",
-  "dev1_role": "Full Stack Developer",
-  "dev1_bio": "Full-stack developer passionate about building scalable e-commerce solutions and modern web applications.",
-  "dev1_email_label": "Email",
-  "dev1_linkedin_label": "LinkedIn",
-  
-  "dev2_name": "Khajan Bhatt",
-  "dev2_role": "Full Stack Developer",
-  "dev2_bio": "Full-stack developer specializing in React and modern web technologies, building innovative solutions.",
-  "dev2_email_label": "Email",
-  "dev2_linkedin_label": "LinkedIn",
-  "dev2_github_label": "GitHub"
+  "khajan_description": "Full Stack Developer and C++, Python Programmer with hands-on experience on building web applications. Designed and implemented scalable features, optimized backend processes, and REST APIs. Solved 750+ DSA problems- LeetCode Knight and CodeChef 3 star, strengthening algorithmic depth and coding efficiency.",
+  "vineet_description": "Full Stack Developer and JavaScript, React, Node.js programmer with hands-on experience in building modern responsive user interfaces, optimized APIs, and integrated databases for scalable systems. Solved 200+ LeetCode problems, strengthening problem-solving, algorithmic thinking, and real-world software development capabilities."
 }

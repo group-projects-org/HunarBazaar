@@ -1,278 +1,67 @@
-import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Header, Footer } from './header_footer';
-import { Mail, Linkedin, Github, MapPin, Globe, ChevronDown } from 'lucide-react';
-
+import { Mail, Linkedin, Github, MapPin, Globe } from 'lucide-react';
+import { FaBullseye, FaBinoculars } from "react-icons/fa";
+import { DeveloperSocialCard, TitleDescriptionCard } from './Cards';
 const About = () => {
   const { user_type } = useParams();
-  const { t, i18n } = useTranslation('about');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { t, i18n } = useTranslation(['about', 'common']);
+  const developerInfo = [
+    {name: t('khajan', {ns: "common"}), designation: t('khajan_designation', {ns: "common"}), description: t('khajan_description', {ns: "about"}), image: "/assets/Commons/tanuj_profile.jfif", phone: t('khajan_phone', {ns: "common"}), email: t('khajan_email', {ns: "common"}), address: t('khajan_location', {ns: "common"}), github: "https://github.com/Khajan38", linkedin: "https://www.linkedin.com/in/khajanbhatt/", portfolio: "https://khajan38.vercel.app/", instagram: "https://www.instagram.com/tanuj_bhatt38/", twitter: "https://x.com/khajan_bhatt38", resume: "https://khajan38.github.io/Resume/Khajan-Bhatt-Resume.pdf", discord: "https://discord.com/users/khajan38_79800", leetcode: "https://leetcode.com/u/khajan_bhatt/", codechef: "https://www.codechef.com/users/khajan_bhatt" },
+    {name: t('vineet', {ns: "common"}), designation: t('vineet_designation', {ns: "common"}), description: t('vineet_description', {ns: "about"}), image: "/assets/Commons/vineet_profile.jpeg", phone: t('vineet_phone', {ns: "common"}), email: t('vineet_email', {ns: "common"}), address: t('vineet_location', {ns: "common"}), github: "https://github.com/vineet358", linkedin: "https://www.linkedin.com/in/vineet-pandey-5807692b4/", portfolio: "https://vineet358.github.io/resume/vineet__pandey_resum.pdf", instagram: "https://www.instagram.com/_vineet__pandey_/", twitter: "https://x.com/vineet__pandey", resume: "https://vineet358.github.io/resume/vineet__pandey_resum.pdf", leetcode: "https://leetcode.com/u/vineet__pandey/", codechef: "https://www.codechef.com/users/vineetpandey32"},
+  ];
 
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
-    setIsDropdownOpen(false);
-  };
-
-  const currentLanguage = i18n.language === 'hi' ? 'हिंदी' : 'English';
-
-  return (
-    <div>
-      <Header userType={user_type} />
-      
-      <main className="min-h-screen bg-gray-50">
-  
-        <div className="bg-white border-b-4 border-green-500 py-8 px-4">
-          <div className="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-              {t('hero_title')}
-            </h1>
-            
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md transition-colors"
-              >
-                <Globe size={20} />
-                <span className="font-medium">{currentLanguage}</span>
-                <ChevronDown 
-                  size={16} 
-                  className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-              
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-10">
-                  <button
-                    onClick={() => changeLanguage('en')}
-                    className={`w-full text-left px-4 py-3 hover:bg-green-50 transition-colors ${
-                      i18n.language === 'en' ? 'bg-green-100 text-green-700 font-semibold' : 'text-gray-700'
-                    }`}
-                  >
-                    English
-                  </button>
-                  <button
-                    onClick={() => changeLanguage('hi')}
-                    className={`w-full text-left px-4 py-3 hover:bg-green-50 transition-colors ${
-                      i18n.language === 'hi' ? 'bg-green-100 text-green-700 font-semibold' : 'text-gray-700'
-                    }`}
-                  >
-                    हिंदी
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+  return (<>
+    <Header userType={user_type} />
+    <div className="relative w-full max-w-[1200px] bg-transparent md:bg-[#f4f4f4] rounded-lg md:shadow-[0_4px_10px_rgba(0,0,0,0.1)] h-full mx-auto my-10 py-0 px-10 md:py-10 text-justify">
+      <div className="relative flex flex-col md:flex-row items-center mb-6 w-full">
+        <h1 className="font-bold md:absolute md:left-1/2 md:-translate-x-1/2 text-4xl text-green-900 text-center underline" style={{ fontFamily: "Montserrat, Poppins, sans-serif" }}> {t('about', { ns: 'common' })} </h1>
+        <div className="flex flex-row items-center justify-center gap-2 ml-auto mt-2 md:mt-0">
+          <Globe className="w-5 h-5 text-gray-500" />
+          <select className="p-2.5 border border-gray-300 rounded" onChange={(e) => i18n.changeLanguage(e.target.value) } value={i18n.language}>
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+          </select>
         </div>
-
-        <div className="max-w-6xl mx-auto px-4 py-12">
-          <section className="mb-16">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
-              {t('intro_title')}
-            </h2>
-            <p className="text-lg text-gray-700 leading-relaxed">
-              {t('intro_text')}
-            </p>
-          </section>
-
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            <section className="bg-white p-8 rounded-lg shadow-md border-t-4 border-green-500">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                {t('mission_title')}
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                {t('mission_text')}
-              </p>
-            </section>
-
-            <section className="bg-white p-8 rounded-lg shadow-md border-t-4 border-green-500">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                {t('vision_title')}
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                {t('vision_text')}
-              </p>
-            </section>
-          </div>
-
-          <section className="mb-16">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              {t('values_title')}
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((num) => (
-                <div
-                  key={num}
-                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                >
-                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl font-bold mb-4">
-                    {num}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                    {t(`value${num}_title`)}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {t(`value${num}_text`)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="mb-16">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                {t('team_title')}
-              </h2>
-              <p className="text-gray-600 text-lg">
-                {t('team_subtitle')}
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <div className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-500">
-                <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                    KB
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-800">
-                    {t('dev2_name')}
-                  </h3>
-                  <p className="text-green-600 font-semibold text-lg">
-                    {t('dev2_role')}
-                  </p>
-                </div>
-                <p className="text-gray-600 mb-6 text-center leading-relaxed">
-                  {t('dev2_bio')}
-                </p>
-                <div className="space-y-3">
-                  <a
-                    href="mailto:tanujbhatt8279@gmail.com"
-                    className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors p-2 rounded hover:bg-green-50"
-                  >
-                    <Mail size={20} className="flex-shrink-0" />
-                    <span className="text-sm break-all">
-                      tanujbhatt@gmail.com
-                    </span>
-                  </a>
-                  <a
-                    href="https://www.linkedin.com/in/khajanbhatt/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors p-2 rounded hover:bg-green-50"
-                  >
-                    <Linkedin size={20} className="flex-shrink-0" />
-                    <span className="text-sm">
-                      {t('dev2_linkedin_label')}
-                    </span>
-                  </a>
-                  <a
-                    href="https://github.com/Khajan38"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors p-2 rounded hover:bg-green-50"
-                  >
-                    <Github size={20} className="flex-shrink-0" />
-                    <span className="text-sm">
-                      {t('dev2_github_label')}
-                    </span>
-                  </a>
-                 
-                </div>
-              </div>
-
-            
-              <div className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-500">
-                <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                    VP
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-800">
-                    {t('dev1_name')}
-                  </h3>
-                  <p className="text-green-600 font-semibold text-lg">
-                    {t('dev1_role')}
-                  </p>
-                </div>
-                <p className="text-gray-600 mb-6 text-center leading-relaxed">
-                  {t('dev1_bio')}
-                </p>
-                <div className="space-y-3">
-                  <a
-                    href="mailto:vineetpandey9935@gmail.com"
-                    className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors p-2 rounded hover:bg-green-50"
-                  >
-                    <Mail size={20} className="flex-shrink-0" />
-                    <span className="text-sm break-all">
-                      vineetpande200@gmail.com
-                    </span>
-                  </a>
-                  <a
-                    href="https://www.linkedin.com/in/vineet-pandey-5807692b4/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors p-2 rounded hover:bg-green-50"
-                  >
-                    <Linkedin size={20} className="flex-shrink-0" />
-                    <span className="text-sm">
-                      {t('dev1_linkedin_label')}
-                    </span>
-                  </a>
-                  <a
-                    href="https://github.com/vineet358"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors p-2 rounded hover:bg-green-50"
-                  >
-                    <Github size={20} className="flex-shrink-0" />
-                    <span className="text-sm">
-                      {t('dev2_github_label')}
-                    </span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </section>
-
+      </div>
         
-          <section className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg shadow-md">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-              {t('contact_title')}
-            </h2>
-            <div className="max-w-2xl mx-auto space-y-4">
-              <div className="flex items-center gap-4 text-gray-700 p-3 bg-white rounded-lg">
-                <Mail className="text-green-600 flex-shrink-0" size={24} />
-                <div>
-                  <span className="font-semibold">{t('contact_email_label')}:</span>
-                  <span className="ml-2">tanujbhatt8279@gmail.com</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-gray-700 p-3 bg-white rounded-lg">
-                <MapPin className="text-green-600 flex-shrink-0" size={24} />
-                <div>
-                  <span className="font-semibold">{t('contact_address_label')}:</span>
-                  <span className="ml-2">{t('contact_address')}</span>
-                </div>
-              </div>
+      <div className="flex flex-col md:flex-row items-center gap-8 mb-16">
+        <div className="flex-1">
+          <div className="flex justify-end items-right gap-4 bg-[url('/assets/Commons/about_background.jpeg')] bg-cover bg-center p-4 rounded-lg">
+            <img className="bg-transparent rounded-[50%] p-2" style={{height:"120px", width:"120px"}} src={'/assets/Hunar_Bazaar.jpeg'} alt="App Logo"/>
+            <div className='flex flex-col justify-center items-end gap-0'>
+              <h1 className='text-[30px] sm:text-[50px] font-bold text-[#b92438]' style={{ fontFamily:"Montserrat, Poppins, sans-serif"}}>{t('brand', {ns:"common"})}</h1>
+              <p className='text-[9px] sm:text-[12px] font-bold text-[#b92438] uppercase' style={{fontFamily:"Montserrat, Poppins, sans-serif"}}>{t('brandline', {ns:"common"})}</p>
             </div>
-          </section>
+          </div>
+          <h3 className='font-bold text-left text-[25px] text-green-900 underline my-4 uppercase' style={{fontFamily: "Montserrat"}}>{t('intro_title')}:</h3>
+          <p className="text-lg text-gray-700 leading-relaxed">{t('intro_text')}</p>
         </div>
-      </main>
+        <img className="h-full w-full md:w-[30%] rounded-lg" src="/assets/Commons/about_side_video.gif" alt="About Us"/>
+      </div>
 
-      <Footer />
+      <div className="grid md:grid-cols-2 gap-8 mb-8">
+        <TitleDescriptionCard title={t('mission_title')} description={t('mission_text')} icon={FaBullseye} />
+        <TitleDescriptionCard title={t('vision_title')} description={t('vision_text')} icon={FaBinoculars} />
+      </div>
+
+      <h3 className='font-bold text-center text-[25px] text-green-900 underline mb-8 uppercase' style={{fontFamily: "Montserrat"}}>{t('values_title', {ns: "about"})}</h3>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {[0, 1, 2, 3, 4, 5].map((num) => (<TitleDescriptionCard title={t(`value${num}_title`)} description={t(`value${num}_text`)} key={num} index={num} showIndex={true} collapsible={true} />))}
+      </div>
+
+      <section className="mb-16">
+        <div className="text-center mb-12">
+          <h3 className='font-bold text-center text-[25px] text-green-900 underline uppercase' style={{fontFamily: "Montserrat"}}>{t('team_title', {ns: "about"})}</h3>
+          <p className="text-gray-600 text-lg" style={{fontFamily: "Montserrat"}}>{t('team_subtitle')}</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">{developerInfo.map((dev, i) => (<DeveloperSocialCard key={i} developerInfo={dev} />))}</div>
+      </section>
+
     </div>
-  );
+    <Footer />
+  </>);
 };
 
 export default About;
-
-// const links = [
-//     ["Privacy Policy", "https://www.linkedin.com/in/khajanbhatt/", "https://cdn-icons-png.flaticon.com/512/174/174857.png"],
-//     ["Khajan38", "https://github.com/Khajan38/", "https://cdn-icons-png.flaticon.com/512/733/733553.png"],
-//     ["Khajan Bhatt", "https://khajan38.vercel.app/", "https://cdn-icons-png.flaticon.com/512/841/841364.png"],
-//     ["tanujbhatt8279@gmail.com", "mailto:tanujbhatt8279@gmail.com", "https://cdn-icons-png.flaticon.com/512/732/732200.png"],
-  // ];
-
-  // <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="text-[#45a049] hover:text-black transition-colors duration-300 no-underline text-[0.7rem] md:text-[0.9rem] flex items-center justify-start wrap-break-all " style={{marginBottom: "7px", paddingLeft: "20%", fontFamily: "Poppins, sans-serif"}} >
-  //             <img className="w-[15px] h-[15px] md:w-[25px] md:h-[25px]" style={{margin: "0px 8px"}}src={icon} alt={name} /> {name} 
-  //           </a>

@@ -1,6 +1,10 @@
+import React from 'react';
+import {Globe, Mail, Phone, MapPin, FileText, ChevronDown, ChevronUp, Minus, Plus} from "lucide-react";
+import { SiCodechef, SiCodeforces, SiLeetcode, SiGithub, SiLinkedin, SiInstagram, SiFacebook, SiDiscord } from 'react-icons/si';
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Minus, Plus } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import { FaXTwitter } from "react-icons/fa6"; 
+
 
 const CategoryCard = ({ category }) => {
   const navigate = useNavigate();
@@ -100,4 +104,95 @@ const MarqueeCard = ({ announcements = ["🎉 Mega Festive Sale — Up to 70% OF
   </>);
 };
 
-export { CategoryCard, ProductCard, MarqueeCard };
+const TitleDescriptionCard = ({title, description, index, showIndex = false, variant = "default", icon: Icon = null, actions = null, collapsible = false, className = "",}) => {
+  const [open, setOpen] = useState(true);
+  const variantStyles = {
+    default: "border-gray-200 bg-gray-50",
+    info: "border-blue-200 bg-blue-50",
+    success: "border-green-200 bg-green-50",
+    warning: "border-yellow-200 bg-yellow-50",
+  }; const variantBadgeStyles = {
+    default: "bg-gray-800 text-white",
+    info: "bg-blue-600 text-white",
+    success: "bg-green-600 text-white",
+    warning: "bg-yellow-500 text-black",
+  };
+  return (
+    <div className={`w-full rounded-xl border shadow-sm transition-all duration-300hover:scale-[1.02] hover:shadow-md ${variantStyles[variant]} ${className}`}>
+      <div className="py-6 px-7">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          {showIndex && (<span className={`flex items-center justify-center w-10 h-10 text-sm font-semibold rounded-full ${variantBadgeStyles[variant]}`}>{index + 1}</span>)}
+          {Icon && (<Icon className="w-6 h-6 text-green-900" />)}
+          <h2 className={`text-center text-[22px] font-bold ${!showIndex ? "text-green-900 underline" : "text-gray-800"} uppercase`}>{title}</h2>
+        </div>
+
+        {open && (<p className="text-gray-600 leading-relaxed text">{description}</p>)}
+
+        {collapsible && (<button onClick={() => setOpen(!open)} className="mt-3 text-sm text-blue-600 hover:underline">{open ? "Show less" : "Show more"}</button>)}
+
+        {actions && (<div className="mt-4 flex justify-center gap-3">{actions}</div>)}
+      </div>
+    </div>
+  );
+};
+
+const DeveloperSocialCard = ({ developerInfo }) => {
+  const {name, designation, description, image = null, phone, email, address, github, linkedin, portfolio, instagram, twitter, resume, discord, facebook, leetcode, codechef, codeforces} = developerInfo;
+  const [showMore, setShowMore] = React.useState(false);
+  const initials = name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+  return (
+    <div className="w-full max-w-md rounded-2xl border bg-white shadow-md p-6 transition hover:shadow-lg">
+      <div className="flex items-center gap-4">
+        {image ? (<img src={image} alt={name} className="w-16 h-16 rounded-full object-cover border"/>
+        ) : (<div className="w-16 h-16 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold">{initials}</div>)}
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">{name}</h2>
+          <p className="text-sm text-green-800 font-medium">{designation}</p>
+        </div>
+      </div>
+
+      {description && (<p className="mt-4 text-gray-600 text-sm leading-relaxed">{description}</p>)}
+
+      <div className="mt-4 space-y-2 text-sm text-gray-700">
+        {phone && (<div className="flex items-center gap-2">
+          <Phone className="w-4 h-4" />
+          <a href={`tel:${phone}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-black transition-colors duration-300 no-underline text-[0.7rem] md:text-[0.9rem] wrap-break-all " style={{fontFamily: "Poppins, sans-serif"}}>{phone}</a>
+        </div>)}
+        {email && (<div className="flex items-center gap-2">
+          <Mail className="w-4 h-4" />
+          <a href={`mailto:${email}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-black transition-colors duration-300 no-underline text-[0.7rem] md:text-[0.9rem] wrap-break-all " style={{fontFamily: "Poppins, sans-serif"}}>{email}</a>
+        </div>)}
+        {address && (<div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-black transition-colors duration-300 no-underline text-[0.7rem] md:text-[0.9rem] wrap-break-all " style={{fontFamily: "Poppins, sans-serif"}}>{address}</a>
+        </div>)}
+      </div>
+
+      <div className="mt-5 flex justify-center gap-4">
+        {github && (<a href={github} target="_blank" rel="noreferrer"><SiGithub className="w-5 h-5 hover:text-black" /></a>)}
+        {linkedin && (<a href={linkedin} target="_blank" rel="noreferrer"><SiLinkedin className="w-5 h-5 hover:text-blue-600" /></a>)}
+        {portfolio && (<a href={portfolio} target="_blank" rel="noreferrer"><Globe className="w-5 h-5 hover:text-green-700" /></a>)}
+      </div>
+
+      {(instagram || twitter || resume || discord) && (
+        <>
+          <button onClick={() => setShowMore((p) => !p)} className="mt-4 flex items-center gap-1 text-sm mx-auto cursor-pointer"> {showMore ? "View less" : "View more"} {showMore ? (<ChevronUp className="w-4 h-4" />) : (<ChevronDown className="w-4 h-4" />)}</button>
+
+          {showMore && (
+            <div className="mt-4 flex justify-center gap-4">
+              {resume && (<a href={resume} target="_blank" rel="noreferrer"><FileText className="w-5 h-5 hover:text-gray-700" /></a>)}
+              {discord && (<a href={discord} target="_blank" rel="noreferrer"> <SiDiscord className="w-5 h-5 hover:text-indigo-600" /></a>)}
+              {instagram && (<a href={instagram} target="_blank" rel="noreferrer"><SiInstagram className="w-5 h-5 hover:text-pink-600" /></a>)}
+              {twitter && (<a href={twitter} target="_blank" rel="noreferrer"><FaXTwitter className="w-5 h-5 hover:text-sky-500" /></a>)}
+              {facebook && (<a href={facebook} target="_blank" rel="noreferrer"><SiFacebook className="w-5 h-5 hover:text-blue-800" /></a>)}
+              {leetcode && (<a href={leetcode} target="_blank" rel="noreferrer"><SiLeetcode className="w-5 h-5 hover:text-orange-500" /></a>)}
+              {codechef && (<a href={codechef} target="_blank" rel="noreferrer"><SiCodechef className="w-5 h-5 hover:text-yellow-500" /></a>)}
+              {codeforces && (<a href={codeforces} target="_blank" rel="noreferrer"><SiCodeforces className="w-5 h-5 hover:text-blue-500" /></a>)}
+            </div>
+          )}
+      </>)}
+    </div>
+  );
+};
+
+export { CategoryCard, ProductCard, MarqueeCard, TitleDescriptionCard, DeveloperSocialCard };
